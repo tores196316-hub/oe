@@ -1,21 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { Sparkles, Shield, Lock, FileText, HelpCircle, Heart, Bell } from 'lucide-react';
-import { Announcement } from '../types';
+import { useSite } from '../context/SiteContext';
 
 export const Footer: React.FC = () => {
-  const [announcements, setAnnouncements] = useState<Announcement[]>([]);
-
-  useEffect(() => {
-    fetch('/api/announcements')
-      .then((res) => res.json())
-      .then((data) => {
-        if (Array.isArray(data)) {
-          setAnnouncements(data.filter((a) => a.active));
-        }
-      })
-      .catch(() => {});
-  }, []);
+  const { settings, announcements } = useSite();
 
   return (
     <footer className="bg-slate-900 text-slate-400 pt-16 pb-12 border-t border-slate-800">
@@ -38,10 +27,10 @@ export const Footer: React.FC = () => {
               <div className="w-8 h-8 rounded-lg bg-indigo-600 text-white flex items-center justify-center">
                 <Sparkles className="w-4 h-4 text-indigo-200" />
               </div>
-              <span className="font-bold text-xl text-white tracking-tight">PicVault</span>
+              <span className="font-bold text-xl text-white tracking-tight">{settings.siteName || 'İnan Hızlı Medya'}</span>
             </div>
             <p className="text-sm text-slate-400 max-w-sm leading-relaxed">
-              Apple, Discord ve Linear tarzında tasarlanmış ultra hızlı, güvenli ve ücretsiz resim yükleme ve CDN barındırma platformu.
+              inanhızlımedya.online — Ultra hızlı, güvenli ve ücretsiz resim yükleme ve CDN barındırma platformu.
             </p>
             <div className="flex items-center gap-3 text-xs text-slate-500 pt-2">
               <span className="flex items-center gap-1">
@@ -65,11 +54,6 @@ export const Footer: React.FC = () => {
               <li>
                 <Link to="/galeri" className="hover:text-white transition-colors">
                   Resim Galerisi
-                </Link>
-              </li>
-              <li>
-                <Link to="/blog" className="hover:text-white transition-colors">
-                  Blog & Rehberler
                 </Link>
               </li>
               <li>

@@ -150,8 +150,8 @@ class MemoryStore {
   public announcements: Announcement[] = [
     {
       id: 'ann-1',
-      title: 'PicVault V2.0 Yayında!',
-      message: 'Cloudinary entegrasyonu, AVIF & WEBP desteği ve yenilenen ultra hızlı CDN altyapımızla hizmetinizdeyiz.',
+      title: 'İnan Hızlı Medya Yayında!',
+      message: 'inanhızlımedya.online adresimiz üzerinden Cloudinary entegrasyonu, AVIF & WEBP desteği ve yenilenen ultra hızlı altyapımızla hizmetinizdeyiz.',
       type: 'info',
       active: true,
       createdAt: new Date().toISOString(),
@@ -168,16 +168,16 @@ class MemoryStore {
     sidebarEnabled: false,
     sidebarCode: '',
     footerEnabled: true,
-    footerCode: '<div class="p-2 text-center text-xs text-slate-400">Görsel Yükleme Platformu Sponsoru</div>',
+    footerCode: '<div class="p-2 text-center text-xs text-slate-400">İnan Hızlı Medya - Görsel Yükleme Platformu</div>',
     timerSeconds: 5,
   };
 
   public siteSettings: SiteSettings = {
-    siteName: 'PicVault',
-    siteDescription: 'Apple, Discord ve Linear tarzında ultra minimal, hızlı ve güvenli resim yükleme platformu.',
+    siteName: 'İnan Hızlı Medya',
+    siteDescription: 'inanhızlımedya.online - Ultra hızlı, güvenli ve ücretsiz resim yükleme ve barındırma platformu.',
     logoUrl: '/favicon.ico',
     faviconUrl: '/favicon.ico',
-    seoKeywords: 'resim yükle, hızlı görsel barındırma, image host, ücretsiz resim yükleme, cloudinary, webp dönüştürücü',
+    seoKeywords: 'inanhızlımedya, inanhizlimedya, resim yükle, hızlı görsel barındırma, image host, ücretsiz resim yükleme, webp dönüştürücü',
     analyticsId: 'G-PV12345678',
     maxUploadSizeMB: 25,
     allowedFormats: ['png', 'jpg', 'jpeg', 'webp', 'gif', 'avif'],

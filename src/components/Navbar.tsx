@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useSite } from '../context/SiteContext';
 import {
   Upload,
   Grid,
@@ -19,6 +20,7 @@ import {
 export const Navbar: React.FC = () => {
   const location = useLocation();
   const { userProfile, isAdmin, logout } = useAuth();
+  const { settings } = useSite();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const isActive = (path: string) => location.pathname === path;
@@ -27,7 +29,6 @@ export const Navbar: React.FC = () => {
     { name: 'Ana Sayfa', path: '/' },
     { name: 'Yükle', path: '/upload', icon: Upload, highlight: true },
     { name: 'Galeri', path: '/galeri', icon: Grid },
-    { name: 'Blog', path: '/blog', icon: FileText },
     { name: 'Hakkımızda', path: '/hakkimizda', icon: Info },
     { name: 'İletişim', path: '/iletisim', icon: Phone },
   ];
@@ -42,7 +43,7 @@ export const Navbar: React.FC = () => {
           </div>
           <div className="flex flex-col">
             <span className="font-bold text-lg tracking-tight text-slate-900 flex items-center gap-1.5">
-              PicVault
+              {settings.siteName || 'İnan Hızlı Medya'}
               <span className="text-[10px] font-semibold uppercase px-1.5 py-0.5 rounded-full bg-slate-100 border border-slate-200 text-slate-600">
                 PRO
               </span>

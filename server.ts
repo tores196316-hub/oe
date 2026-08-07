@@ -343,21 +343,71 @@ async function startServer() {
   });
 
   // 11. Announcements API
-  app.get('/api/announcements', (_req, res) => {
-    res.json(store.announcements);
+  app.get('/api/announcements', (req, res) => {
+    if (req.query.onlyActive === 'true') {
+      res.json(store.announcements.filter((a) => a.active));
+    } else {
+      res.json(store.announcements);
+    }
   });
 
   app.post('/api/announcements', (req, res) => {
     const newAnn = {
-      id: 'ann-' + Date.now(),
-      title: req.body.title,
-      message: req.body.message,
+      id: 'ann-' + Date.now() + '-' + Math.random().toString(36).substring(2, 6),
+      title: req.body.title || 'Duyuru',
+      message: req.body.message || '',
       type: req.body.type || 'info',
-      active: true,
+      active: req.body.active !== undefined ? Boolean(req.body.active) : true,
+      badge: req.body.badge || '',
+      linkUrl: req.body.linkUrl || '',
+      linkText: req.body.linkText || '',
+      priority: req.body.priority || 'normal',
       createdAt: new Date().toISOString(),
     };
     store.announcements.unshift(newAnn);
     res.json(newAnn);
+  });
+
+  app.put('/api/announcements/:id', (req, res): void => {
+    const idx = store.announcements.findIndex((a) => a.id === req.params.id);
+    if (idx === -1) {
+      res.status(404).json({ error: 'Duyuru bulunamadı' });
+      return;
+    }
+    const existing = store.announcements[idx];
+    const updated = {
+      ...existing,
+      title: req.body.title !== undefined ? req.body.title : existing.title,
+      message: req.body.message !== undefined ? req.body.message : existing.message,
+      type: req.body.type !== undefined ? req.body.type : existing.type,
+      active: req.body.active !== undefined ? Boolean(req.body.active) : existing.active,
+      badge: req.body.badge !== undefined ? req.body.badge : existing.badge,
+      linkUrl: req.body.linkUrl !== undefined ? req.body.linkUrl : existing.linkUrl,
+      linkText: req.body.linkText !== undefined ? req.body.linkText : existing.linkText,
+      priority: req.body.priority !== undefined ? req.body.priority : existing.priority,
+    };
+    store.announcements[idx] = updated;
+    res.json(updated);
+  });
+
+  app.patch('/api/announcements/:id/toggle', (req, res): void => {
+    const ann = store.announcements.find((a) => a.id === req.params.id);
+    if (!ann) {
+      res.status(404).json({ error: 'Duyuru bulunamadı' });
+      return;
+    }
+    ann.active = !ann.active;
+    res.json(ann);
+  });
+
+  app.delete('/api/announcements/:id', (req, res): void => {
+    const idx = store.announcements.findIndex((a) => a.id === req.params.id);
+    if (idx === -1) {
+      res.status(404).json({ error: 'Duyuru bulunamadı' });
+      return;
+    }
+    store.announcements.splice(idx, 1);
+    res.json({ success: true, message: 'Duyuru silindi' });
   });
 
   // 12. DMCA API

@@ -73,9 +73,13 @@ export interface Announcement {
   id: string;
   title: string;
   message: string;
-  type: 'info' | 'warning' | 'success' | 'alert';
+  type: 'info' | 'warning' | 'success' | 'alert' | 'update';
   active: boolean;
   createdAt: string;
+  badge?: string;
+  linkUrl?: string;
+  linkText?: string;
+  priority?: 'low' | 'normal' | 'high';
 }
 
 export interface AdConfig {
