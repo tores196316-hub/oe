@@ -104,72 +104,76 @@ async function startServer() {
       const isPublic = req.body.isPublic === 'false' ? false : true;
       const customFolder = req.body.folder || `/uploads/${new Date().getFullYear()}/${String(new Date().getMonth() + 1).padStart(2, '0')}/`;
 
-      const uploadedResults: ImageItem[] = [];
+      const { isConfigured } = getCloudinaryClient();
 
-      for (const file of files) {
-        const ext = path.extname(file.originalname).replace('.', '').toLowerCase() || 'jpg';
-        const fileId = 'pv_' + Math.random().toString(36).substring(2, 11) + '_' + Date.now();
-        const deleteToken = 'del_' + Math.random().toString(36).substring(2, 15);
+      const uploadedResults: ImageItem[] = await Promise.all(
+        files.map(async (file) => {
+          const ext = path.extname(file.originalname).replace('.', '').toLowerCase() || 'jpg';
+          const fileId = 'pv_' + Math.random().toString(36).substring(2, 11) + '_' + Date.now();
+          const deleteToken = 'del_' + Math.random().toString(36).substring(2, 15);
 
-        let secureUrl = '';
-        let thumbnailUrl = '';
-        let publicId = `picvault/uploads/${fileId}`;
-        let format = ext;
-        let width = 1200;
-        let height = 800;
-        let size = file.size;
+          let secureUrl = '';
+          let thumbnailUrl = '';
+          let publicId = `picvault/uploads/${fileId}`;
+          let format = ext;
+          let width = 1200;
+          let height = 800;
+          let size = file.size;
 
-        const { isConfigured } = getCloudinaryClient();
-
-        if (isConfigured) {
-          try {
-            const cloudRes = await uploadToCloudinary(file.buffer, file.originalname, customFolder);
-            secureUrl = cloudRes.secureUrl;
-            thumbnailUrl = cloudRes.thumbnailUrl;
-            publicId = cloudRes.publicId;
-            format = cloudRes.format;
-            width = cloudRes.width;
-            height = cloudRes.height;
-            size = cloudRes.size;
-          } catch (cloudErr) {
-            console.warn('Cloudinary upload error, using local fallback URL:', cloudErr);
+          if (isConfigured) {
+            try {
+              const cloudRes = await uploadToCloudinary(file.buffer, file.originalname, customFolder);
+              secureUrl = cloudRes.secureUrl;
+              thumbnailUrl = cloudRes.thumbnailUrl;
+              publicId = cloudRes.publicId;
+              format = cloudRes.format;
+              width = cloudRes.width;
+              height = cloudRes.height;
+              size = cloudRes.size;
+            } catch (cloudErr) {
+              console.warn('Cloudinary upload error, using local fallback URL:', cloudErr);
+              const base64 = `data:${file.mimetype};base64,${file.buffer.toString('base64')}`;
+              secureUrl = base64;
+              thumbnailUrl = base64;
+            }
+          } else {
+            // Fallback to high-speed inline Data URL when Cloudinary keys are not yet entered in Admin Panel or .env
             const base64 = `data:${file.mimetype};base64,${file.buffer.toString('base64')}`;
             secureUrl = base64;
             thumbnailUrl = base64;
           }
-        } else {
-          // Fallback to high-speed inline Data URL when Cloudinary keys are not yet entered in Admin Panel or .env
-          const base64 = `data:${file.mimetype};base64,${file.buffer.toString('base64')}`;
-          secureUrl = base64;
-          thumbnailUrl = base64;
-        }
 
-        const imageRecord: ImageItem = {
-          id: fileId,
-          publicId,
-          url: secureUrl,
-          thumbnailUrl,
-          title: req.body.title || file.originalname.split('.')[0],
-          description: req.body.description || '',
-          fileName: file.originalname,
-          size,
-          format,
-          width,
-          height,
-          isPublic,
-          folder: customFolder,
-          userId,
-          userEmail,
-          userName,
-          createdAt: new Date().toISOString(),
-          views: 0,
-          downloads: 0,
-          deleteToken,
-          tags: req.body.tags ? String(req.body.tags).split(',').map((t) => t.trim()) : [],
-        };
+          const imageRecord: ImageItem = {
+            id: fileId,
+            publicId,
+            url: secureUrl,
+            thumbnailUrl,
+            title: req.body.title || file.originalname.split('.')[0],
+            description: req.body.description || '',
+            fileName: file.originalname,
+            size,
+            format,
+            width,
+            height,
+            isPublic,
+            folder: customFolder,
+            userId,
+            userEmail,
+            userName,
+            createdAt: new Date().toISOString(),
+            views: 0,
+            downloads: 0,
+            deleteToken,
+            tags: req.body.tags ? String(req.body.tags).split(',').map((t) => t.trim()) : [],
+          };
 
-        store.images.unshift(imageRecord);
-        uploadedResults.push(imageRecord);
+          return imageRecord;
+        })
+      );
+
+      // Add uploaded images to store
+      for (const img of uploadedResults) {
+        store.images.unshift(img);
       }
 
       res.status(200).json({

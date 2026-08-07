@@ -23,6 +23,7 @@ import { ImageItem } from '../types';
 import { useToast } from '../context/ToastContext';
 import { useAuth } from '../context/AuthContext';
 import { QRModal } from '../components/QRModal';
+import { compressImage } from '../utils/imageCompressor';
 
 interface FileQueueItem {
   id: string;
@@ -114,71 +115,81 @@ export const UploadPage: React.FC = () => {
   };
 
   const uploadQueueItems = async (items: FileQueueItem[]) => {
-    for (const item of items) {
-      setQueue((prev) =>
-        prev.map((q) => (q.id === item.id ? { ...q, status: 'uploading', progress: 30 } : q))
-      );
-
-      const formData = new FormData();
-      formData.append('images', item.file);
-      formData.append('isPublic', 'false');
-      if (userProfile) {
-        formData.append('userId', userProfile.uid);
-        formData.append('userName', userProfile.displayName);
-        formData.append('userEmail', userProfile.email);
-      }
-
-      try {
+    // Process queue items concurrently in parallel
+    await Promise.all(
+      items.map(async (item) => {
         setQueue((prev) =>
-          prev.map((q) => (q.id === item.id ? { ...q, progress: 65 } : q))
+          prev.map((q) => (q.id === item.id ? { ...q, status: 'uploading', progress: 15 } : q))
         );
 
-        const res = await fetch('/api/upload', {
-          method: 'POST',
-          body: formData,
-        });
+        try {
+          // Ultra-fast client-side image optimization (shrinks 10MB camera photos to ~800KB in milliseconds)
+          const optimizedFile = await compressImage(item.file);
 
-        const data = await res.json();
-
-        if (res.ok && data.images && data.images.length > 0) {
-          const resultImg: ImageItem = data.images[0];
           setQueue((prev) =>
-            prev.map((q) =>
-              q.id === item.id ? { ...q, status: 'completed', progress: 100, result: resultImg } : q
-            )
+            prev.map((q) => (q.id === item.id ? { ...q, progress: 40 } : q))
           );
 
-          // Save image ID locally for personal gallery
-          try {
-            const existingIds: string[] = JSON.parse(localStorage.getItem('my_uploaded_image_ids') || '[]');
-            if (!existingIds.includes(resultImg.id)) {
-              existingIds.unshift(resultImg.id);
-              localStorage.setItem('my_uploaded_image_ids', JSON.stringify(existingIds));
-            }
-          } catch (e) {}
+          const formData = new FormData();
+          formData.append('images', optimizedFile);
+          formData.append('isPublic', 'false');
+          if (userProfile) {
+            formData.append('userId', userProfile.uid);
+            formData.append('userName', userProfile.displayName);
+            formData.append('userEmail', userProfile.email);
+          }
 
-          // Confetti celebration
-          confetti({
-            particleCount: 80,
-            spread: 60,
-            origin: { y: 0.6 },
+          setQueue((prev) =>
+            prev.map((q) => (q.id === item.id ? { ...q, progress: 75 } : q))
+          );
+
+          const res = await fetch('/api/upload', {
+            method: 'POST',
+            body: formData,
           });
 
-          showToast('Resim başarıyla yüklendi!', 'success');
-        } else {
-          throw new Error(data.error || 'Yükleme başarısız oldu.');
+          const data = await res.json();
+
+          if (res.ok && data.images && data.images.length > 0) {
+            const resultImg: ImageItem = data.images[0];
+            setQueue((prev) =>
+              prev.map((q) =>
+                q.id === item.id ? { ...q, status: 'completed', progress: 100, result: resultImg } : q
+              )
+            );
+
+            // Save image ID locally for personal gallery
+            try {
+              const existingIds: string[] = JSON.parse(localStorage.getItem('my_uploaded_image_ids') || '[]');
+              if (!existingIds.includes(resultImg.id)) {
+                existingIds.unshift(resultImg.id);
+                localStorage.setItem('my_uploaded_image_ids', JSON.stringify(existingIds));
+              }
+            } catch (e) {}
+
+            // Confetti celebration
+            confetti({
+              particleCount: 60,
+              spread: 50,
+              origin: { y: 0.6 },
+            });
+
+            showToast(`${optimizedFile.name} yüklendi!`, 'success');
+          } else {
+            throw new Error(data.error || 'Yükleme başarısız oldu.');
+          }
+        } catch (err: any) {
+          setQueue((prev) =>
+            prev.map((q) =>
+              q.id === item.id
+                ? { ...q, status: 'error', progress: 0, errorMessage: err.message || 'Yükleme hatası' }
+                : q
+            )
+          );
+          showToast(err.message || 'Resim yüklenemedi', 'error');
         }
-      } catch (err: any) {
-        setQueue((prev) =>
-          prev.map((q) =>
-            q.id === item.id
-              ? { ...q, status: 'error', progress: 0, errorMessage: err.message || 'Yükleme hatası' }
-              : q
-          )
-        );
-        showToast(err.message || 'Resim yüklenemedi', 'error');
-      }
-    }
+      })
+    );
   };
 
   const handleDrop = (e: React.DragEvent) => {
