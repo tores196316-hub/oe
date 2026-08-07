@@ -72,11 +72,21 @@ export const ProfilePage: React.FC = () => {
   };
 
   const deleteUserImage = async (id: string) => {
+    if (userProfile?.role !== 'admin') {
+      showToast('Resim silme yetkiniz bulunmamaktadır. Resimleriniz güvenli şekilde saklanmaktadır.', 'error');
+      return;
+    }
     try {
-      const res = await fetch(`/api/images/${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/images/${id}?role=admin`, {
+        method: 'DELETE',
+        headers: { 'x-admin-role': 'admin' },
+      });
       if (res.ok) {
         setUserImages((prev) => prev.filter((i) => i.id !== id));
         showToast('Resim silindi', 'success');
+      } else {
+        const data = await res.json();
+        showToast(data.error || 'Resim silinemedi', 'error');
       }
     } catch (err) {
       showToast('Resim silinemedi', 'error');
@@ -201,12 +211,15 @@ export const ProfilePage: React.FC = () => {
                   >
                     <ExternalLink className="w-4 h-4" />
                   </Link>
-                  <button
-                    onClick={() => deleteUserImage(img.id)}
-                    className="p-1.5 text-rose-500 hover:text-rose-700 rounded-lg hover:bg-rose-50"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
+                  {userProfile?.role === 'admin' && (
+                    <button
+                      onClick={() => deleteUserImage(img.id)}
+                      className="p-1.5 text-rose-500 hover:text-rose-700 rounded-lg hover:bg-rose-50"
+                      title="Sil (Yönetici Yetkisi)"
+                    >
+                      <Trash2 className="w-4 h-4" />
+                    </button>
+                  )}
                 </div>
               </div>
             ))}

@@ -205,8 +205,18 @@ export const AnnouncementDrawer: React.FC<AnnouncementDrawerProps> = ({
           </div>
 
           {/* Footer */}
-          <div className="p-4 border-t border-slate-100 text-center text-xs text-slate-400 bg-slate-50/50">
-            İnan Hızlı Medya — Canlı Duyuru Servisi
+          <div className="p-4 border-t border-slate-100 flex items-center justify-between gap-2 text-xs text-slate-500 bg-slate-50/50">
+            <button
+              onClick={() => {
+                localStorage.removeItem('dismissed_announcement_ids');
+                window.dispatchEvent(new Event('storage'));
+                window.location.reload();
+              }}
+              className="text-[11px] font-semibold text-indigo-600 hover:text-indigo-800 hover:underline cursor-pointer"
+            >
+              Gizlenen Banner Duyurularını Göster
+            </button>
+            <span className="text-[11px] text-slate-400">İnan Hızlı Medya</span>
           </div>
         </motion.div>
       </div>

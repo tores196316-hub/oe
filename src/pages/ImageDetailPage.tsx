@@ -20,6 +20,7 @@ import {
 } from 'lucide-react';
 import { ImageItem } from '../types';
 import { useToast } from '../context/ToastContext';
+import { useAuth } from '../context/AuthContext';
 import { QRModal } from '../components/QRModal';
 
 export const ImageDetailPage: React.FC = () => {
@@ -29,12 +30,13 @@ export const ImageDetailPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [activeEmbed, setActiveEmbed] = useState<'direct' | 'html' | 'markdown' | 'bbcode'>('direct');
+  const [activeEmbed, setActiveEmbed] = useState<'page' | 'direct' | 'html' | 'markdown' | 'bbcode'>('page');
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [qrModalOpen, setQrModalOpen] = useState(false);
 
   const { showToast } = useToast();
+  const { userProfile } = useAuth();
 
   useEffect(() => {
     if (!id) return;
@@ -86,13 +88,22 @@ export const ImageDetailPage: React.FC = () => {
 
   const handleDelete = async () => {
     if (!image) return;
+    if (userProfile?.role !== 'admin') {
+      showToast('Normal kullanıcıların resim silme yetkisi bulunmamaktadır.', 'error');
+      setDeleteModalOpen(false);
+      return;
+    }
     try {
-      const res = await fetch(`/api/images/${image.id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/images/${image.id}?role=admin`, {
+        method: 'DELETE',
+        headers: { 'x-admin-role': 'admin' },
+      });
       if (res.ok) {
         showToast('Görsel başarıyla silindi', 'success');
-        navigate('/galeri');
+        navigate('/upload');
       } else {
-        throw new Error('Silme işlemi başarısız.');
+        const data = await res.json();
+        throw new Error(data.error || 'Silme işlemi başarısız.');
       }
     } catch (err: any) {
       showToast(err.message || 'Hata oluştu', 'error');
@@ -131,16 +142,21 @@ export const ImageDetailPage: React.FC = () => {
     );
   }
 
+  const sitePageUrl = image ? `${window.location.origin}/resim/${image.id}` : '';
+
   const getEmbedCode = () => {
+    if (!image) return '';
     switch (activeEmbed) {
+      case 'page':
+        return sitePageUrl;
       case 'direct':
         return image.url;
       case 'html':
-        return `<img src="${image.url}" alt="${image.title || image.fileName}" />`;
+        return `<a href="${sitePageUrl}" target="_blank"><img src="${image.url}" alt="${image.title || image.fileName}" /></a>`;
       case 'markdown':
-        return `![${image.title || image.fileName}](${image.url})`;
+        return `[![${image.title || image.fileName}](${image.url})](${sitePageUrl})`;
       case 'bbcode':
-        return `[img]${image.url}[/img]`;
+        return `[url=${sitePageUrl}][img]${image.url}[/img][/url]`;
     }
   };
 
@@ -187,7 +203,7 @@ export const ImageDetailPage: React.FC = () => {
               </button>
 
               <button
-                onClick={() => copyCode(image.url, 'direct_btn')}
+                onClick={() => copyCode(sitePageUrl, 'direct_btn')}
                 className="px-3.5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold transition-colors flex items-center gap-1.5"
               >
                 {copiedKey === 'direct_btn' ? (
@@ -225,20 +241,31 @@ export const ImageDetailPage: React.FC = () => {
               </a>
             </div>
 
-            <button
-              onClick={() => setDeleteModalOpen(true)}
-              className="px-3.5 py-2.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-semibold transition-colors flex items-center gap-1.5"
-            >
-              <Trash2 className="w-4 h-4 text-rose-600" />
-              Sil
-            </button>
+            {userProfile?.role === 'admin' && (
+              <button
+                onClick={() => setDeleteModalOpen(true)}
+                className="px-3.5 py-2.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-semibold transition-colors flex items-center gap-1.5"
+                title="Sil (Yönetici Yetkisi)"
+              >
+                <Trash2 className="w-4 h-4 text-rose-600" />
+                Sil
+              </button>
+            )}
           </div>
 
           {/* Embed Code Tabs */}
           <div className="p-6 rounded-3xl bg-white border border-slate-200/80 shadow-xs space-y-4">
             <h3 className="font-bold text-sm text-slate-900 tracking-wide uppercase">Gömme Kodları (Embed)</h3>
 
-            <div className="flex items-center gap-2 border-b border-slate-100 pb-2">
+            <div className="flex flex-wrap items-center gap-2 border-b border-slate-100 pb-2">
+              <button
+                onClick={() => setActiveEmbed('page')}
+                className={`text-xs font-bold px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1 ${
+                  activeEmbed === 'page' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-100'
+                }`}
+              >
+                Site Sayfa Linki
+              </button>
               <button
                 onClick={() => setActiveEmbed('direct')}
                 className={`text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors ${

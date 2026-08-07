@@ -78,7 +78,7 @@ async function startServer() {
   });
 
   // 1. Upload API Endpoint
-  app.post('/api/upload', upload.array('images', 10), async (req, res): Promise<void> => {
+  app.post('/api/upload', upload.array('images', 15), async (req, res): Promise<void> => {
     try {
       const files = req.files as Express.Multer.File[];
       if (!files || files.length === 0) {
@@ -86,10 +86,22 @@ async function startServer() {
         return;
       }
 
-      const isPublic = req.body.isPublic === 'false' ? false : true;
       const userId = req.body.userId || undefined;
       const userName = req.body.userName || 'Anonim Ziyaretçi';
       const userEmail = req.body.userEmail || undefined;
+      const isMember = Boolean(userId || userEmail);
+      const maxLimit = isMember ? 15 : 5;
+
+      if (files.length > maxLimit) {
+        res.status(400).json({
+          error: isMember
+            ? 'Aynı anda en fazla 15 resim yükleyebilirsiniz.'
+            : 'Üye olmadan aynı anda en fazla 5 resim yükleyebilirsiniz. 15 resim birden yüklemek için lütfen ücretsiz kayıt olun.',
+        });
+        return;
+      }
+
+      const isPublic = req.body.isPublic === 'false' ? false : true;
       const customFolder = req.body.folder || `/uploads/${new Date().getFullYear()}/${String(new Date().getMonth() + 1).padStart(2, '0')}/`;
 
       const uploadedResults: ImageItem[] = [];
@@ -252,6 +264,12 @@ async function startServer() {
 
   // 5. Delete Image
   app.delete('/api/images/:id', async (req, res): Promise<void> => {
+    const role = req.headers['x-admin-role'] || req.query.role;
+    if (role !== 'admin') {
+      res.status(403).json({ error: 'Normal kullanıcıların resim silme yetkisi bulunmamaktadır. Silme işlemleri yalnızca yöneticiler tarafından gerçekleştirilebilir.' });
+      return;
+    }
+
     const idx = store.images.findIndex((i) => i.id === req.params.id);
     if (idx === -1) {
       res.status(404).json({ error: 'Görsel bulunamadı.' });
@@ -259,7 +277,6 @@ async function startServer() {
     }
 
     const img = store.images[idx];
-    const deleteToken = req.query.token || req.body.deleteToken;
 
     // Delete from Cloudinary if possible
     if (img.publicId) {

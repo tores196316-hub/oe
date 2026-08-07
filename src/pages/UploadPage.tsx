@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import confetti from 'canvas-confetti';
+import { Link } from 'react-router-dom';
 import {
   Upload,
   Image as ImageIcon,
@@ -15,6 +16,8 @@ import {
   Link as LinkIcon,
   Code,
   ExternalLink,
+  UserCheck,
+  UserPlus,
 } from 'lucide-react';
 import { ImageItem } from '../types';
 import { useToast } from '../context/ToastContext';
@@ -35,13 +38,15 @@ export const UploadPage: React.FC = () => {
   const [queue, setQueue] = useState<FileQueueItem[]>([]);
   const [isDragOver, setIsDragOver] = useState(false);
   const [isPublic, setIsPublic] = useState(true);
-  const [activeTab, setActiveTab] = useState<'direct' | 'html' | 'markdown' | 'bbcode'>('direct');
+  const [activeTab, setActiveTab] = useState<'page' | 'direct' | 'html' | 'markdown' | 'bbcode'>('page');
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [qrModalUrl, setQrModalUrl] = useState<{ url: string; title: string } | null>(null);
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { showToast } = useToast();
   const { userProfile } = useAuth();
+
+  const maxAllowedFiles = userProfile ? 15 : 5;
 
   // Clipboard paste handler (Ctrl+V) listener
   useEffect(() => {
@@ -65,16 +70,27 @@ export const UploadPage: React.FC = () => {
 
     window.addEventListener('paste', handlePaste);
     return () => window.removeEventListener('paste', handlePaste);
-  }, []);
+  }, [userProfile]);
 
   const addFilesToQueue = (files: File[]) => {
-    const allowedFormats = ['png', 'jpg', 'jpeg', 'webp', 'gif', 'avif'];
     const maxMB = 25;
+    let filesToProcess = files;
+
+    if (files.length > maxAllowedFiles) {
+      if (!userProfile) {
+        showToast(
+          'Üye olmadan aynı anda en fazla 5 resim yükleyebilirsiniz. 15 resim birden yüklemek için ücretsiz üye olun!',
+          'warning'
+        );
+      } else {
+        showToast('Aynı anda en fazla 15 resim yükleyebilirsiniz. İlk 15 resim işleme alındı.', 'info');
+      }
+      filesToProcess = files.slice(0, maxAllowedFiles);
+    }
 
     const newItems: FileQueueItem[] = [];
 
-    for (const file of files) {
-      const ext = file.name.split('.').pop()?.toLowerCase() || '';
+    for (const file of filesToProcess) {
       if (file.size > maxMB * 1024 * 1024) {
         showToast(`${file.name} çok büyük! Maksimum dosya boyutu ${maxMB} MB olabilir.`, 'error');
         continue;
@@ -192,8 +208,26 @@ export const UploadPage: React.FC = () => {
   const copyCode = (text: string, key: string) => {
     navigator.clipboard.writeText(text);
     setCopiedKey(key);
-    showToast('Koda özel panoya kopyalandı!', 'success');
+    showToast('Bağlantı panoya kopyalandı!', 'success');
     setTimeout(() => setCopiedKey(null), 2000);
+  };
+
+  const getPageUrl = (id: string) => `${window.location.origin}/resim/${id}`;
+
+  const getEmbedCode = (itemResult: ImageItem) => {
+    const pageUrl = getPageUrl(itemResult.id);
+    switch (activeTab) {
+      case 'page':
+        return pageUrl;
+      case 'direct':
+        return itemResult.url;
+      case 'html':
+        return `<a href="${pageUrl}" target="_blank"><img src="${itemResult.url}" alt="${itemResult.fileName}" /></a>`;
+      case 'markdown':
+        return `[![${itemResult.fileName}](${itemResult.url})](${pageUrl})`;
+      case 'bbcode':
+        return `[url=${pageUrl}][img]${itemResult.url}[/img][/url]`;
+    }
   };
 
   return (
@@ -211,17 +245,34 @@ export const UploadPage: React.FC = () => {
         </p>
       </div>
 
-      {/* Settings Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-4 p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs">
-        <div className="flex items-center gap-3">
-          <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-100">
-            <Lock className="w-4 h-4 text-indigo-600" />
-            <span>Gizli & Kişisel Yükleme (Sadece size ve bağlantıya sahip olanlara özel)</span>
+      {/* Settings & Limits Bar */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs">
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-100">
+            <Lock className="w-4 h-4 text-indigo-600 shrink-0" />
+            <span>Kişisel & Güvenli Yükleme</span>
           </div>
+
+          {!userProfile ? (
+            <div className="flex items-center gap-2 bg-amber-50 text-amber-800 border border-amber-200/80 px-3 py-1.5 rounded-xl text-xs font-semibold">
+              <span>Ziyaretçi Limiti: <strong>Aynı anda 5 Resim</strong></span>
+              <Link
+                to="/auth?tab=register"
+                className="ml-1 text-indigo-600 font-bold hover:underline flex items-center gap-1 bg-white px-2 py-0.5 rounded-md border border-indigo-100 shadow-2xs"
+              >
+                <UserPlus className="w-3 h-3" /> 15 Resim İçin Kaydol
+              </Link>
+            </div>
+          ) : (
+            <div className="flex items-center gap-1.5 bg-emerald-50 text-emerald-800 border border-emerald-200/80 px-3 py-1.5 rounded-xl text-xs font-bold">
+              <UserCheck className="w-3.5 h-3.5 text-emerald-600" />
+              <span>Üye Limiti: <strong>Aynı anda 15 Resim Aktif</strong></span>
+            </div>
+          )}
         </div>
 
         <span className="text-xs text-slate-500">
-          Desteklenen formatlar: <strong className="text-slate-800">PNG, JPG, WEBP, GIF, AVIF</strong> (Maks 25 MB)
+          Formatlar: <strong className="text-slate-800">PNG, JPG, WEBP, GIF, AVIF</strong> (Maks 25 MB)
         </span>
       </div>
 
@@ -260,6 +311,11 @@ export const UploadPage: React.FC = () => {
             </p>
             <p className="text-xs text-slate-400 mt-1">
               Veya ekran görüntüsünü doğrudan buraya yapıştırın <kbd className="px-1.5 py-0.5 rounded bg-slate-100 border border-slate-300 font-mono text-[10px]">Ctrl+V</kbd>
+            </p>
+            <p className="text-xs text-indigo-600 font-semibold mt-2">
+              {!userProfile
+                ? '⚡ Misafir olarak aynı anda 5 resim yükleyebilirsiniz.'
+                : '⚡ Üye olarak aynı anda 15 resim birden yükleyebilirsiniz.'}
             </p>
           </div>
         </div>
@@ -341,14 +397,25 @@ export const UploadPage: React.FC = () => {
                 {item.status === 'completed' && item.result && (
                   <div className="pt-4 border-t border-slate-100 space-y-3">
                     {/* Embed Tabs */}
-                    <div className="flex items-center gap-2 border-b border-slate-100 pb-2">
+                    <div className="flex flex-wrap items-center gap-2 border-b border-slate-100 pb-2">
+                      <button
+                        onClick={() => setActiveTab('page')}
+                        className={`text-xs font-bold px-3 py-1 rounded-lg transition-colors flex items-center gap-1 ${
+                          activeTab === 'page'
+                            ? 'bg-indigo-600 text-white shadow-xs'
+                            : 'text-slate-600 hover:bg-slate-100'
+                        }`}
+                      >
+                        <Globe className="w-3.5 h-3.5" />
+                        Site Sayfa Bağlantısı
+                      </button>
                       <button
                         onClick={() => setActiveTab('direct')}
                         className={`text-xs font-semibold px-3 py-1 rounded-lg transition-colors ${
                           activeTab === 'direct' ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100'
                         }`}
                       >
-                        Direkt Bağlantı
+                        Direkt Resim
                       </button>
                       <button
                         onClick={() => setActiveTab('html')}
@@ -356,7 +423,7 @@ export const UploadPage: React.FC = () => {
                           activeTab === 'html' ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100'
                         }`}
                       >
-                        HTML
+                        HTML Kodu
                       </button>
                       <button
                         onClick={() => setActiveTab('markdown')}
@@ -378,31 +445,23 @@ export const UploadPage: React.FC = () => {
 
                     {/* Code Display Box */}
                     <div className="flex items-center gap-2 bg-slate-900 text-slate-100 p-3 rounded-xl font-mono text-xs overflow-x-auto">
-                      <span className="flex-1 truncate">
-                        {activeTab === 'direct' && item.result.url}
-                        {activeTab === 'html' && `<img src="${item.result.url}" alt="${item.result.fileName}" />`}
-                        {activeTab === 'markdown' && `![${item.result.fileName}](${item.result.url})`}
-                        {activeTab === 'bbcode' && `[img]${item.result.url}[/img]`}
+                      <span className="flex-1 truncate select-all">
+                        {getEmbedCode(item.result)}
                       </span>
 
                       <button
-                        onClick={() => {
-                          const codeText =
-                            activeTab === 'direct'
-                              ? item.result!.url
-                              : activeTab === 'html'
-                              ? `<img src="${item.result!.url}" alt="${item.result!.fileName}" />`
-                              : activeTab === 'markdown'
-                              ? `![${item.result!.fileName}](${item.result!.url})`
-                              : `[img]${item.result!.url}[/img]`;
-                          copyCode(codeText, `${item.id}_${activeTab}`);
-                        }}
-                        className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-indigo-300 shrink-0 transition-colors"
+                        onClick={() => copyCode(getEmbedCode(item.result!), `${item.id}_${activeTab}`)}
+                        className="p-1.5 rounded-lg bg-indigo-600 hover:bg-indigo-700 text-white shrink-0 transition-colors flex items-center gap-1 font-sans text-[11px] font-bold"
+                        title="Kopyala"
                       >
                         {copiedKey === `${item.id}_${activeTab}` ? (
-                          <Check className="w-4 h-4 text-emerald-400" />
+                          <>
+                            <Check className="w-3.5 h-3.5 text-emerald-300" /> Kopyalandı
+                          </>
                         ) : (
-                          <Copy className="w-4 h-4" />
+                          <>
+                            <Copy className="w-3.5 h-3.5" /> Kopyala
+                          </>
                         )}
                       </button>
                     </div>
@@ -412,22 +471,22 @@ export const UploadPage: React.FC = () => {
                       <button
                         onClick={() =>
                           setQrModalUrl({
-                            url: item.result!.url,
+                            url: getPageUrl(item.result!.id),
                             title: item.result!.fileName,
                           })
                         }
                         className="flex items-center gap-1.5 text-slate-600 hover:text-slate-900 font-semibold"
                       >
-                        <QrCode className="w-4 h-4 text-indigo-600" /> QR Kod Üret
+                        <QrCode className="w-4 h-4 text-indigo-600" /> Sayfa QR Kodunu Üret
                       </button>
 
                       <a
-                        href={`/resim/${item.result.id}`}
+                        href={getPageUrl(item.result.id)}
                         target="_blank"
                         rel="noreferrer"
-                        className="flex items-center gap-1.5 text-indigo-600 font-semibold hover:underline"
+                        className="flex items-center gap-1.5 text-indigo-600 font-bold hover:underline bg-indigo-50 border border-indigo-100 px-3 py-1 rounded-lg"
                       >
-                        Detay Sayfasına Git <ExternalLink className="w-3.5 h-3.5" />
+                        Sitedeki Resim Sayfasına Git <ExternalLink className="w-3.5 h-3.5" />
                       </a>
                     </div>
                   </div>
@@ -449,3 +508,4 @@ export const UploadPage: React.FC = () => {
     </div>
   );
 };
+

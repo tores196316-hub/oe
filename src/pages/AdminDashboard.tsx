@@ -276,7 +276,10 @@ export const AdminDashboard: React.FC = () => {
   // Delete Image
   const handleDeleteImage = async (id: string) => {
     try {
-      const res = await fetch(`/api/images/${id}`, { method: 'DELETE' });
+      const res = await fetch(`/api/images/${id}?role=admin`, {
+        method: 'DELETE',
+        headers: { 'x-admin-role': 'admin' },
+      });
       if (res.ok) {
         setImages((prev) => prev.filter((i) => i.id !== id));
         await refreshData();
