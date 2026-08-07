@@ -1,0 +1,122 @@
+{
+  "entities": {
+    "Image": {
+      "title": "Image",
+      "description": "Uploaded image metadata record",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "publicId": { "type": "string" },
+        "url": { "type": "string" },
+        "thumbnailUrl": { "type": "string" },
+        "title": { "type": "string", "maxLength": 200 },
+        "description": { "type": "string", "maxLength": 1000 },
+        "fileName": { "type": "string", "maxLength": 255 },
+        "size": { "type": "number" },
+        "format": { "type": "string" },
+        "width": { "type": "number" },
+        "height": { "type": "number" },
+        "isPublic": { "type": "boolean" },
+        "folder": { "type": "string" },
+        "userId": { "type": "string" },
+        "userEmail": { "type": "string" },
+        "userName": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "views": { "type": "number" },
+        "downloads": { "type": "number" },
+        "deleteToken": { "type": "string" }
+      },
+      "required": ["publicId", "url", "fileName", "size", "format", "isPublic"]
+    },
+    "BlogPost": {
+      "title": "BlogPost",
+      "description": "SEO blog article",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string", "maxLength": 300 },
+        "slug": { "type": "string" },
+        "content": { "type": "string" },
+        "summary": { "type": "string" },
+        "category": { "type": "string" },
+        "coverImage": { "type": "string" },
+        "authorName": { "type": "string" },
+        "createdAt": { "type": "string" },
+        "readTime": { "type": "string" },
+        "views": { "type": "number" }
+      },
+      "required": ["title", "slug", "content"]
+    },
+    "UserProfile": {
+      "title": "UserProfile",
+      "description": "Registered user profile",
+      "type": "object",
+      "properties": {
+        "uid": { "type": "string" },
+        "email": { "type": "string" },
+        "displayName": { "type": "string" },
+        "photoURL": { "type": "string" },
+        "role": { "type": "string", "enum": ["user", "admin"] },
+        "apiKey": { "type": "string" },
+        "totalUploads": { "type": "number" },
+        "totalViews": { "type": "number" },
+        "totalDownloads": { "type": "number" },
+        "totalStorageBytes": { "type": "number" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["uid", "email"]
+    },
+    "Announcement": {
+      "title": "Announcement",
+      "description": "Site-wide announcements",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "title": { "type": "string" },
+        "message": { "type": "string" },
+        "type": { "type": "string", "enum": ["info", "warning", "success", "alert"] },
+        "active": { "type": "boolean" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["title", "message", "active"]
+    },
+    "DMCA": {
+      "title": "DMCA",
+      "description": "DMCA takedown notice submission",
+      "type": "object",
+      "properties": {
+        "fullName": { "type": "string" },
+        "email": { "type": "string" },
+        "companyName": { "type": "string" },
+        "imageUrl": { "type": "string" },
+        "originalWorkUrl": { "type": "string" },
+        "statement": { "type": "string" },
+        "status": { "type": "string" },
+        "createdAt": { "type": "string" }
+      },
+      "required": ["fullName", "email", "imageUrl", "statement"]
+    }
+  },
+  "firestore": {
+    "/images/{imageId}": {
+      "schema": "Image",
+      "description": "Uploaded image documents"
+    },
+    "/blogs/{blogId}": {
+      "schema": "BlogPost",
+      "description": "Published blog articles"
+    },
+    "/users/{userId}": {
+      "schema": "UserProfile",
+      "description": "User profiles"
+    },
+    "/announcements/{announcementId}": {
+      "schema": "Announcement",
+      "description": "Broadcast announcements"
+    },
+    "/dmca/{dmcaId}": {
+      "schema": "DMCA",
+      "description": "DMCA takedown notices"
+    }
+  }
+}

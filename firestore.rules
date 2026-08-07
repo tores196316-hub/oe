@@ -1,0 +1,82 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // Default deny all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // Helper functions
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.token.email == 'tores196316@gmail.com' ||
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'admin'
+      );
+    }
+
+    // Images Collection
+    match /images/{imageId} {
+      // Anyone can read public images or direct image page; owners or admins can read any
+      allow get: if resource.data.isPublic == true || isOwner(resource.data.userId) || isAdmin();
+      allow list: if resource.data.isPublic == true || isOwner(resource.data.userId) || isAdmin();
+      
+      // Creating images: allowed if guest upload is open or user is signed in
+      allow create: if request.resource.data.url is string &&
+                       request.resource.data.size is number &&
+                       request.resource.data.fileName is string;
+      
+      // Updating: owner or admin, or public incrementing view/download counter
+      allow update: if isOwner(resource.data.userId) || isAdmin() || 
+                       (request.resource.data.diff(resource.data).affectedKeys().hasOnly(['views', 'downloads']));
+
+      // Deleting: owner or admin or matching delete token
+      allow delete: if isOwner(resource.data.userId) || isAdmin();
+    }
+
+    // Blogs Collection
+    match /blogs/{blogId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Users Collection
+    match /users/{userId} {
+      allow read: if isSignedIn();
+      allow create, update: if isOwner(userId) || isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // Announcements
+    match /announcements/{announcementId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // DMCA Notices
+    match /dmca/{dmcaId} {
+      allow create: if request.resource.data.fullName is string && request.resource.data.email is string;
+      allow read, write: if isAdmin();
+    }
+
+    // Contact Submissions
+    match /contacts/{contactId} {
+      allow create: if request.resource.data.name is string && request.resource.data.email is string;
+      allow read, write: if isAdmin();
+    }
+
+    // Site Settings & Ads
+    match /settings/{settingId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+  }
+}
