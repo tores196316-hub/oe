@@ -8,7 +8,6 @@ import {
   Globe,
   Sparkles,
   Layers,
-  Search,
 } from 'lucide-react';
 import { useSite } from '../context/SiteContext';
 
@@ -62,14 +61,6 @@ export const HomePage: React.FC = () => {
             >
               <Upload className="w-5 h-5 text-indigo-400 group-hover:animate-bounce" />
               <span>Resmini Hemen Yükle</span>
-            </Link>
-
-            <Link
-              to="/galeri"
-              className="w-full sm:w-auto px-7 py-4 rounded-2xl bg-white border border-slate-200 text-slate-800 font-semibold text-base shadow-xs hover:bg-slate-50 transition-colors flex items-center justify-center gap-2"
-            >
-              <Search className="w-4 h-4 text-slate-500" />
-              <span>Galeriyi İncele</span>
             </Link>
           </motion.div>
 
