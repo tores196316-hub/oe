@@ -33,12 +33,22 @@ async function startServer() {
   app.use(express.json({ limit: '50mb' }));
   app.use(express.urlencoded({ extended: true, limit: '50mb' }));
 
+  // 0. Healthcheck endpoints (Must be BEFORE rate limiting for container probes)
+  app.get('/health', (_req, res) => {
+    res.status(200).send('OK');
+  });
+
+  app.get('/api/health', (_req, res) => {
+    res.status(200).json({ status: 'ok', time: new Date().toISOString() });
+  });
+
   // Rate Limiting for API routes
   const apiLimiter = rateLimit({
     windowMs: 15 * 60 * 1000, // 15 minutes
-    max: 300, // limit each IP to 300 requests per window
+    max: 1000, // expanded limit to avoid false positive blocks
     standardHeaders: true,
     legacyHeaders: false,
+    skip: (req) => req.path === '/health' || req.path === '/api/health',
     message: { error: 'Çok fazla istek gönderdiniz, lütfen 15 dakika sonra tekrar deneyin.' },
   });
 
@@ -65,11 +75,6 @@ async function startServer() {
         cb(new Error(`Desteklenmeyen dosya türü: ${file.mimetype}. İzin verilenler: PNG, JPG, WEBP, GIF, AVIF`));
       }
     },
-  });
-
-  // Healthcheck API
-  app.get('/api/health', (_req, res) => {
-    res.json({ status: 'ok', time: new Date().toISOString() });
   });
 
   // 1. Upload API Endpoint
