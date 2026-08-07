@@ -134,7 +134,7 @@ export const ContactPage: React.FC = () => {
                 <Mail className="w-5 h-5 text-indigo-600 shrink-0" />
                 <div>
                   <p className="font-semibold text-slate-900">E-posta</p>
-                  <p>destek@picvault.app</p>
+                  <p>destek@inanhızlımedya.online</p>
                 </div>
               </div>
 
@@ -150,7 +150,7 @@ export const ContactPage: React.FC = () => {
                 <Globe className="w-5 h-5 text-indigo-600 shrink-0" />
                 <div>
                   <p className="font-semibold text-slate-900">Sosyal Medya</p>
-                  <p>@picvault_app (Twitter, GitHub, Discord)</p>
+                  <p>@inanhizlimedya (Twitter, GitHub, Discord)</p>
                 </div>
               </div>
             </div>

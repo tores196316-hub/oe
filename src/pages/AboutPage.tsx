@@ -7,7 +7,7 @@ export const AboutPage: React.FC = () => {
       {/* Hero */}
       <div className="text-center space-y-4">
         <span className="px-3 py-1 rounded-full bg-slate-900/5 border border-slate-900/10 text-xs font-semibold text-slate-800 inline-flex items-center gap-1.5">
-          <Sparkles className="w-3.5 h-3.5 text-indigo-600" /> PicVault Vizyonu
+          <Sparkles className="w-3.5 h-3.5 text-indigo-600" /> İnan Hızlı Medya Vizyonu
         </span>
         <h1 className="text-4xl sm:text-5xl font-extrabold text-slate-900 tracking-tight">
           Sade, Güvenli ve Ultra Hızlı Görsel Barındırma

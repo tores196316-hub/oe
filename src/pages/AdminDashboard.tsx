@@ -78,6 +78,8 @@ export const AdminDashboard: React.FC = () => {
     linkUrl: '',
     linkText: '',
     active: true,
+    displayMode: 'banner' as 'banner' | 'modal' | 'both',
+    priority: 'normal' as 'low' | 'normal' | 'high',
   });
 
   // Edit Announcement Modal State
@@ -136,17 +138,21 @@ export const AdminDashboard: React.FC = () => {
           linkUrl: '',
           linkText: '',
           active: true,
+          displayMode: 'both',
+          priority: 'high',
         });
         break;
       case 'ozellik':
         setNewAnn({
-          title: '🚀 PicVault V2.0 Yayında!',
+          title: '🚀 İnan Hızlı Medya V2.5 Yayında!',
           message: 'Yenilenen ultra hızlı CDN altyapımız, otomatik WEBP/AVIF optimizasyonu ve canlı performans paneli aktif edildi!',
           type: 'update',
-          badge: 'YENİ',
+          badge: 'YENİ SÜRÜM',
           linkUrl: '/upload',
           linkText: 'Hemen Dene',
           active: true,
+          displayMode: 'banner',
+          priority: 'normal',
         });
         break;
       case 'hiz':
@@ -154,10 +160,12 @@ export const AdminDashboard: React.FC = () => {
           title: '⚡ Yüksek Hız Performans Güncellemesi',
           message: 'Sunucu yanıt sürelerimiz %50 hızlandırıldı. Tüm yükleme ve indirmeleriniz artık daha seri.',
           type: 'success',
-          badge: 'HIZLI',
+          badge: 'PERFORMANS',
           linkUrl: '',
           linkText: '',
           active: true,
+          displayMode: 'banner',
+          priority: 'normal',
         });
         break;
       case 'guvenlik':
@@ -169,17 +177,21 @@ export const AdminDashboard: React.FC = () => {
           linkUrl: '/gizlilik-politikasi',
           linkText: 'Politikayı Oku',
           active: true,
+          displayMode: 'banner',
+          priority: 'normal',
         });
         break;
       case 'kutlama':
         setNewAnn({
-          title: '🎉 Ücretsiz Sınırsız Görsel Barındırma',
+          title: '🎉 Sınırsız & Ücretsiz Görsel Barındırma',
           message: 'Büyüyen topluluğumuza özel olarak ücretsiz görsel yükleme kotası ve yüksek çözünürlüklü indirme imkanı sunuyoruz.',
           type: 'success',
           badge: 'FIRSAT',
           linkUrl: '',
           linkText: '',
           active: true,
+          displayMode: 'banner',
+          priority: 'normal',
         });
         break;
     }
@@ -204,6 +216,8 @@ export const AdminDashboard: React.FC = () => {
           linkUrl: '',
           linkText: '',
           active: true,
+          displayMode: 'banner',
+          priority: 'normal',
         });
         await refreshData();
         showToast('Yeni duyuru anında sitede yayınlandı!', 'success');
@@ -651,9 +665,14 @@ export const AdminDashboard: React.FC = () => {
           </div>
 
           {/* Create Announcement Form */}
-          <form onSubmit={handleCreateAnn} className="p-6 rounded-3xl bg-white border border-slate-200/80 shadow-xs space-y-4">
-            <h3 className="font-bold text-sm text-slate-900 flex items-center gap-2">
-              <Plus className="w-4 h-4 text-indigo-600" /> Yeni Duyuru Oluştur & Anında Yayınla
+          <form onSubmit={handleCreateAnn} className="p-6 rounded-3xl bg-white border border-slate-200/80 shadow-xs space-y-5">
+            <h3 className="font-bold text-sm text-slate-900 flex items-center justify-between">
+              <span className="flex items-center gap-2">
+                <Plus className="w-4 h-4 text-indigo-600" /> Yeni Duyuru Oluştur & Anında Yayınla
+              </span>
+              <span className="text-xs text-indigo-600 font-semibold bg-indigo-50 px-2.5 py-1 rounded-full border border-indigo-100">
+                Canlı Otomatik Senkronizasyon
+              </span>
             </h3>
 
             <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -701,16 +720,41 @@ export const AdminDashboard: React.FC = () => {
               <textarea
                 rows={2}
                 required
-                placeholder="Kullanıcılara üst bantta gösterilecek duyuru metni..."
+                placeholder="Kullanıcılara gösterilecek duyuru metni..."
                 value={newAnn.message}
                 onChange={(e) => setNewAnn({ ...newAnn, message: e.target.value })}
                 className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs"
               />
             </div>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">Yönlendirme Bağlantısı (Opsiyonel)</label>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">Gösterim Modu</label>
+                <select
+                  value={newAnn.displayMode}
+                  onChange={(e) => setNewAnn({ ...newAnn, displayMode: e.target.value as any })}
+                  className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs bg-white"
+                >
+                  <option value="banner">Üst Bant (Header Banner)</option>
+                  <option value="modal">Modal Pop-up (Açılır Pencere)</option>
+                  <option value="both">Her İkisi (Bant + Pop-up)</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">Öncelik Seviyesi</label>
+                <select
+                  value={newAnn.priority}
+                  onChange={(e) => setNewAnn({ ...newAnn, priority: e.target.value as any })}
+                  className="w-full px-3.5 py-2 rounded-xl border border-slate-200 text-xs bg-white"
+                >
+                  <option value="normal">Normal Öncelik</option>
+                  <option value="high">Yüksek (Açılışta Ön Sırada)</option>
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">Bağlantı URL (Opsiyonel)</label>
                 <input
                   type="text"
                   placeholder="Örn: /upload veya https://..."
@@ -732,9 +776,30 @@ export const AdminDashboard: React.FC = () => {
               </div>
             </div>
 
+            {/* Live Preview Box */}
+            <div className="p-4 rounded-2xl bg-slate-900 text-white space-y-2">
+              <span className="text-[10px] font-extrabold uppercase tracking-widest text-indigo-400 block">
+                Canlı Önizleme Simülatörü
+              </span>
+              <div className="p-3 rounded-xl bg-white/10 border border-white/10 flex items-center justify-between text-xs">
+                <div className="flex items-center gap-2 min-w-0">
+                  <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-indigo-500/30 text-indigo-200 border border-indigo-400/30 uppercase">
+                    {newAnn.badge || 'ETİKET'}
+                  </span>
+                  <span className="font-bold truncate">{newAnn.title || 'Duyuru Başlığı'}</span>
+                  <span className="opacity-80 truncate hidden sm:inline">{newAnn.message || 'Duyuru içeriği metni buraya gelecek.'}</span>
+                </div>
+                {newAnn.linkText && (
+                  <span className="px-2.5 py-1 rounded-lg bg-white text-slate-900 font-bold text-[10px] shrink-0">
+                    {newAnn.linkText}
+                  </span>
+                )}
+              </div>
+            </div>
+
             <button
               type="submit"
-              className="px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-xs transition-colors flex items-center gap-1.5"
+              className="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-semibold shadow-xs transition-colors flex items-center gap-1.5 cursor-pointer"
             >
               <Bell className="w-4 h-4" /> Duyuruyu Anında Yayınla
             </button>

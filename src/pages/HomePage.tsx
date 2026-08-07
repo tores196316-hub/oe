@@ -119,7 +119,7 @@ export const HomePage: React.FC = () => {
       {/* Feature Cards Grid (Linear-style ultra clean) */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         <div className="text-center max-w-2xl mx-auto space-y-2">
-          <h2 className="text-3xl font-bold text-slate-900 tracking-tight">Neden PicVault?</h2>
+          <h2 className="text-3xl font-bold text-slate-900 tracking-tight">Neden İnan Hızlı Medya?</h2>
           <p className="text-sm text-slate-500">
             Apple sadeliği, Discord pratikliği ve Linear hızı tek bir platformda birleşti.
           </p>

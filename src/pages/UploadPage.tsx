@@ -105,7 +105,7 @@ export const UploadPage: React.FC = () => {
 
       const formData = new FormData();
       formData.append('images', item.file);
-      formData.append('isPublic', String(isPublic));
+      formData.append('isPublic', 'false');
       if (userProfile) {
         formData.append('userId', userProfile.uid);
         formData.append('userName', userProfile.displayName);
@@ -131,6 +131,15 @@ export const UploadPage: React.FC = () => {
               q.id === item.id ? { ...q, status: 'completed', progress: 100, result: resultImg } : q
             )
           );
+
+          // Save image ID locally for personal gallery
+          try {
+            const existingIds: string[] = JSON.parse(localStorage.getItem('my_uploaded_image_ids') || '[]');
+            if (!existingIds.includes(resultImg.id)) {
+              existingIds.unshift(resultImg.id);
+              localStorage.setItem('my_uploaded_image_ids', JSON.stringify(existingIds));
+            }
+          } catch (e) {}
 
           // Confetti celebration
           confetti({
@@ -205,17 +214,10 @@ export const UploadPage: React.FC = () => {
       {/* Settings Bar */}
       <div className="flex flex-wrap items-center justify-between gap-4 p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs">
         <div className="flex items-center gap-3">
-          <button
-            onClick={() => setIsPublic(!isPublic)}
-            className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold transition-all ${
-              isPublic
-                ? 'bg-emerald-50 text-emerald-700 border border-emerald-200'
-                : 'bg-slate-100 text-slate-700 border border-slate-200'
-            }`}
-          >
-            {isPublic ? <Globe className="w-4 h-4 text-emerald-600" /> : <Lock className="w-4 h-4 text-slate-600" />}
-            <span>{isPublic ? 'Herkese Açık Galeriye Ekle' : 'Gizli Mod (Sadece Bağlantıyla)'}</span>
-          </button>
+          <div className="flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-100">
+            <Lock className="w-4 h-4 text-indigo-600" />
+            <span>Gizli & Kişisel Yükleme (Sadece size ve bağlantıya sahip olanlara özel)</span>
+          </div>
         </div>
 
         <span className="text-xs text-slate-500">

@@ -12,7 +12,7 @@ export const PrivacyPolicyPage: React.FC = () => {
 
       <div className="prose prose-slate text-sm text-slate-700 space-y-4 leading-relaxed">
         <p>
-          PicVault platformu olarak ziyaretçilerimizin ve kullanıcılarımızın gizliliğine yüksek seviyede önem gösteriyoruz. Bu Gizlilik Politikası belgesi, PicVault tarafından toplanan ve kaydedilen bilgi türlerini ve bunları nasıl kullandığımızı açıklamaktadır.
+          İnan Hızlı Medya platformu olarak ziyaretçilerimizin ve kullanıcılarımızın gizliliğine yüksek seviyede önem gösteriyoruz. Bu Gizlilik Politikası belgesi, İnan Hızlı Medya tarafından toplanan ve kaydedilen bilgi türlerini ve bunları nasıl kullandığımızı açıklamaktadır.
         </p>
 
         <h3 className="text-base font-bold text-slate-900 pt-2">1. Toplanan Bilgiler</h3>
@@ -44,7 +44,7 @@ export const TermsPage: React.FC = () => {
 
       <div className="prose prose-slate text-sm text-slate-700 space-y-4 leading-relaxed">
         <p>
-          PicVault platformuna erişerek ve kullanarak aşağıdaki şart ve koşulları kabul etmiş sayılırsınız.
+          İnan Hızlı Medya platformuna erişerek ve kullanarak aşağıdaki şart ve koşulları kabul etmiş sayılırsınız.
         </p>
 
         <h3 className="text-base font-bold text-slate-900 pt-2">1. Yasaklı İçerikler</h3>
@@ -54,7 +54,7 @@ export const TermsPage: React.FC = () => {
 
         <h3 className="text-base font-bold text-slate-900 pt-2">2. Hizmet Garantisi</h3>
         <p>
-          PicVault kesintisiz hizmet vermeyi amaçlar ancak beklenmeyen teknik arızalar nedeniyle oluşabilecek veri kayıplarından doğrudan sorumlu tutulamaz.
+          İnan Hızlı Medya kesintisiz hizmet vermeyi amaçlar ancak beklenmeyen teknik arızalar nedeniyle oluşabilecek veri kayıplarından doğrudan sorumlu tutulamaz.
         </p>
       </div>
     </div>
@@ -156,7 +156,7 @@ export const DMCAPage: React.FC = () => {
               required
               value={form.imageUrl}
               onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
-              placeholder="https://picvault.app/resim/pv_1234"
+              placeholder="https://inanhızlımedya.online/resim/pv_1234"
               className="w-full px-4 py-2.5 rounded-xl border border-slate-200 text-sm"
             />
           </div>

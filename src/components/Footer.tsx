@@ -106,7 +106,7 @@ export const Footer: React.FC = () => {
 
         {/* Bottom copyright */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500 gap-4">
-          <p>© {new Date().getFullYear()} PicVault Inc. Tüm hakları saklıdır.</p>
+          <p>© {new Date().getFullYear()} İnan Hızlı Medya. Tüm hakları saklıdır.</p>
           <p className="flex items-center gap-1">
             Yüksek performans ile <Heart className="w-3.5 h-3.5 text-rose-500 fill-rose-500" /> geliştirildi.
           </p>

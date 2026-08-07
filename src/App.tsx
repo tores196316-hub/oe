@@ -6,6 +6,7 @@ import { SiteProvider } from './context/SiteContext';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { AnnouncementBanner } from './components/AnnouncementBanner';
+import { AnnouncementModal } from './components/AnnouncementModal';
 
 import { HomePage } from './pages/HomePage';
 import { UploadPage } from './pages/UploadPage';
@@ -27,12 +28,13 @@ export default function App() {
           <SiteProvider>
             <div className="min-h-screen bg-[#fbfbfd] text-slate-900 flex flex-col font-sans antialiased selection:bg-indigo-500 selection:text-white">
               <AnnouncementBanner />
+              <AnnouncementModal />
               <Navbar />
               <main className="flex-1">
                 <Routes>
                   <Route path="/" element={<HomePage />} />
                   <Route path="/upload" element={<UploadPage />} />
-                  <Route path="/galeri" element={<GalleryPage />} />
+                  <Route path="/galeri" element={<Navigate to="/profil" replace />} />
                   <Route path="/resim/:id" element={<ImageDetailPage />} />
                   <Route path="/blog" element={<Navigate to="/" replace />} />
                   <Route path="/blog/:slug" element={<Navigate to="/" replace />} />

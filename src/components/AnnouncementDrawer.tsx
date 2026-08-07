@@ -1,0 +1,215 @@
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'motion/react';
+import { useSite } from '../context/SiteContext';
+import { Announcement } from '../types';
+import {
+  Bell,
+  AlertTriangle,
+  CheckCircle,
+  Sparkles,
+  X,
+  ExternalLink,
+  Shield,
+  CheckCheck,
+  Calendar,
+  Info,
+} from 'lucide-react';
+
+interface AnnouncementDrawerProps {
+  isOpen: boolean;
+  onClose: () => void;
+  readIds: string[];
+  onMarkAllRead: () => void;
+}
+
+export const AnnouncementDrawer: React.FC<AnnouncementDrawerProps> = ({
+  isOpen,
+  onClose,
+  readIds,
+  onMarkAllRead,
+}) => {
+  const { announcements } = useSite();
+  const [activeFilter, setActiveFilter] = useState<'all' | 'unread'>('all');
+
+  if (!isOpen) return null;
+
+  const displayList = announcements.filter((a) => {
+    if (activeFilter === 'unread') {
+      return !readIds.includes(a.id);
+    }
+    return true;
+  });
+
+  const getIcon = (type: string) => {
+    switch (type) {
+      case 'warning':
+        return <AlertTriangle className="w-4 h-4 text-amber-500 shrink-0" />;
+      case 'alert':
+        return <AlertTriangle className="w-4 h-4 text-rose-500 shrink-0" />;
+      case 'success':
+        return <CheckCircle className="w-4 h-4 text-emerald-500 shrink-0" />;
+      case 'update':
+        return <Sparkles className="w-4 h-4 text-purple-500 shrink-0" />;
+      case 'info':
+      default:
+        return <Info className="w-4 h-4 text-indigo-500 shrink-0" />;
+    }
+  };
+
+  const getBadgeStyle = (type: string) => {
+    switch (type) {
+      case 'warning':
+        return 'bg-amber-50 text-amber-700 border-amber-200';
+      case 'alert':
+        return 'bg-rose-50 text-rose-700 border-rose-200';
+      case 'success':
+        return 'bg-emerald-50 text-emerald-700 border-emerald-200';
+      case 'update':
+        return 'bg-purple-50 text-purple-700 border-purple-200';
+      case 'info':
+      default:
+        return 'bg-indigo-50 text-indigo-700 border-indigo-200';
+    }
+  };
+
+  return (
+    <AnimatePresence>
+      <div className="fixed inset-0 z-50 flex justify-end bg-slate-950/40 backdrop-blur-xs">
+        {/* Backdrop click */}
+        <div className="absolute inset-0" onClick={onClose} />
+
+        {/* Drawer content */}
+        <motion.div
+          initial={{ x: '100%' }}
+          animate={{ x: 0 }}
+          exit={{ x: '100%' }}
+          transition={{ type: 'spring', damping: 28, stiffness: 280 }}
+          className="relative w-full max-w-md h-full bg-white shadow-2xl flex flex-col border-l border-slate-200 z-10"
+        >
+          {/* Header */}
+          <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+            <div className="flex items-center gap-2.5">
+              <div className="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center shadow-xs">
+                <Bell className="w-4 h-4" />
+              </div>
+              <div>
+                <h3 className="font-bold text-base text-slate-900 leading-tight">Duyuru Merkezi</h3>
+                <p className="text-xs text-slate-500">Güncellemeler ve sistem haberleri</p>
+              </div>
+            </div>
+
+            <button
+              onClick={onClose}
+              className="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
+
+          {/* Sub Header / Filters */}
+          <div className="px-5 py-3 bg-white border-b border-slate-100 flex items-center justify-between">
+            <div className="flex items-center gap-1.5 p-1 rounded-xl bg-slate-100 text-xs font-semibold">
+              <button
+                onClick={() => setActiveFilter('all')}
+                className={`px-3 py-1 rounded-lg transition-all cursor-pointer ${
+                  activeFilter === 'all'
+                    ? 'bg-white text-slate-900 shadow-xs'
+                    : 'text-slate-500 hover:text-slate-900'
+                }`}
+              >
+                Tümü ({announcements.length})
+              </button>
+              <button
+                onClick={() => setActiveFilter('unread')}
+                className={`px-3 py-1 rounded-lg transition-all cursor-pointer ${
+                  activeFilter === 'unread'
+                    ? 'bg-white text-slate-900 shadow-xs'
+                    : 'text-slate-500 hover:text-slate-900'
+                }`}
+              >
+                Okunmamış ({announcements.filter((a) => !readIds.includes(a.id)).length})
+              </button>
+            </div>
+
+            <button
+              onClick={onMarkAllRead}
+              className="text-xs text-indigo-600 hover:text-indigo-800 font-semibold flex items-center gap-1 cursor-pointer"
+            >
+              <CheckCheck className="w-3.5 h-3.5" /> Okundu Yap
+            </button>
+          </div>
+
+          {/* List Content */}
+          <div className="flex-1 overflow-y-auto p-5 space-y-3">
+            {displayList.length === 0 ? (
+              <div className="py-16 text-center space-y-3 text-slate-400">
+                <Bell className="w-10 h-10 mx-auto stroke-1 opacity-40 text-indigo-400" />
+                <p className="text-sm font-medium">Gösterilecek duyuru bulunmuyor.</p>
+              </div>
+            ) : (
+              displayList.map((ann) => {
+                const isUnread = !readIds.includes(ann.id);
+                return (
+                  <div
+                    key={ann.id}
+                    className={`p-4 rounded-2xl border transition-all ${
+                      isUnread
+                        ? 'bg-indigo-50/40 border-indigo-200/80 shadow-2xs'
+                        : 'bg-white border-slate-200/80 hover:border-slate-300'
+                    }`}
+                  >
+                    <div className="flex items-start justify-between gap-2 mb-1.5">
+                      <div className="flex items-center gap-2">
+                        {getIcon(ann.type)}
+                        <span
+                          className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold uppercase border ${getBadgeStyle(
+                            ann.type
+                          )}`}
+                        >
+                          {ann.badge || (ann.type === 'update' ? 'SÜRÜM' : 'DUYURU')}
+                        </span>
+                        {isUnread && (
+                          <span className="w-2 h-2 rounded-full bg-indigo-600 animate-pulse" />
+                        )}
+                      </div>
+
+                      <span className="text-[11px] text-slate-400 flex items-center gap-1">
+                        <Calendar className="w-3 h-3" />
+                        {new Date(ann.createdAt).toLocaleDateString('tr-TR', {
+                          day: 'numeric',
+                          month: 'short',
+                        })}
+                      </span>
+                    </div>
+
+                    <h4 className="text-sm font-bold text-slate-900 leading-snug mb-1">
+                      {ann.title}
+                    </h4>
+
+                    <p className="text-xs text-slate-600 leading-relaxed mb-3">{ann.message}</p>
+
+                    {ann.linkUrl && (
+                      <a
+                        href={ann.linkUrl}
+                        target={ann.linkUrl.startsWith('http') ? '_blank' : '_self'}
+                        className="inline-flex items-center gap-1 text-xs font-bold text-indigo-600 hover:text-indigo-800 transition-colors"
+                      >
+                        <span>{ann.linkText || 'Detayları İncele'}</span>
+                        <ExternalLink className="w-3.5 h-3.5" />
+                      </a>
+                    )}
+                  </div>
+                );
+              })
+            )}
+          </div>
+
+          {/* Footer */}
+          <div className="p-4 border-t border-slate-100 text-center text-xs text-slate-400 bg-slate-50/50">
+            İnan Hızlı Medya — Canlı Duyuru Servisi
+          </div>
+        </motion.div>
+      </div>
+    </AnimatePresence>
+  );
+};

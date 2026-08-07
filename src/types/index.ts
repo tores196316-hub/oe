@@ -80,6 +80,8 @@ export interface Announcement {
   linkUrl?: string;
   linkText?: string;
   priority?: 'low' | 'normal' | 'high';
+  displayMode?: 'banner' | 'modal' | 'both';
+  dismissible?: boolean;
 }
 
 export interface AdConfig {

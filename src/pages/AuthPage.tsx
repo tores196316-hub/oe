@@ -36,7 +36,7 @@ export const AuthPage: React.FC = () => {
           <Sparkles className="w-6 h-6 text-indigo-400" />
         </div>
         <h1 className="text-2xl font-extrabold text-slate-900">
-          {isRegisterPage ? 'Yeni Hesap Oluştur' : 'PicVault\'a Giriş Yap'}
+          {isRegisterPage ? 'Yeni Hesap Oluştur' : 'İnan Hızlı Medya\'ya Giriş Yap'}
         </h1>
         <p className="text-xs text-slate-500">
           Görsellerinizi yönetin, özel galeriler oluşturun ve API anahtarınızı alın.

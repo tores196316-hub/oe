@@ -28,15 +28,35 @@ export const ProfilePage: React.FC = () => {
   const [userImages, setUserImages] = useState<ImageItem[]>([]);
 
   useEffect(() => {
-    fetch('/api/images?onlyPublic=false')
-      .then((res) => res.json())
-      .then((data) => {
-        if (data && data.images) {
-          setUserImages(data.images);
-        }
-      })
-      .catch(() => {});
-  }, []);
+    let localIds: string[] = [];
+    try {
+      localIds = JSON.parse(localStorage.getItem('my_uploaded_image_ids') || '[]');
+    } catch (e) {}
+
+    const params = new URLSearchParams();
+    if (userProfile?.uid) {
+      params.set('userId', userProfile.uid);
+    }
+    if (userProfile?.email) {
+      params.set('userEmail', userProfile.email);
+    }
+    if (localIds.length > 0) {
+      params.set('ids', localIds.join(','));
+    }
+
+    if (userProfile || localIds.length > 0) {
+      fetch(`/api/images?${params.toString()}`)
+        .then((res) => res.json())
+        .then((data) => {
+          if (data && data.images) {
+            setUserImages(data.images);
+          }
+        })
+        .catch(() => {});
+    } else {
+      setUserImages([]);
+    }
+  }, [userProfile]);
 
   const copyApiKey = () => {
     navigator.clipboard.writeText(apiKey);

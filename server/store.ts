@@ -29,11 +29,11 @@ Son yıllarda geliştirilen WEBP ve AVIF formatları, geleneksel JPEG ve PNG for
 3. **PNG:** Vektörel grafikler, metin içeren görseller ve kayıpsız şeffaflık için idealdir.
 4. **JPEG:** Fotoğraflar için geleneksel ve evrensel formattır.
 
-PicVault olarak tüm görsellerinizi otomatik olarak en uygun format ve boyuta dönüştürerek ışık hızında sunuyoruz.`,
+İnan Hızlı Medya olarak tüm görsellerinizi otomatik olarak en uygun format ve boyuta dönüştürerek ışık hızında sunuyoruz.`,
     category: 'Rehber',
     tags: ['WEBP', 'AVIF', 'SEO', 'Performans', 'Görsel Optimizasyonu'],
     coverImage: 'https://images.unsplash.com/photo-1542744094-3a31b272c490?auto=format&fit=crop&w=1200&q=80',
-    authorName: 'PicVault Mühendislik Ekibi',
+    authorName: 'İnan Hızlı Medya Mühendislik Ekibi',
     createdAt: '2026-08-01T10:00:00.000Z',
     readTime: '4 dk',
     views: 1240,
@@ -150,11 +150,27 @@ class MemoryStore {
   public announcements: Announcement[] = [
     {
       id: 'ann-1',
-      title: 'İnan Hızlı Medya Yayında!',
-      message: 'inanhızlımedya.online adresimiz üzerinden Cloudinary entegrasyonu, AVIF & WEBP desteği ve yenilenen ultra hızlı altyapımızla hizmetinizdeyiz.',
-      type: 'info',
+      title: 'İnan Hızlı Medya V2.5 Yayında!',
+      message: 'inanhızlımedya.online üzerinden ultra hızlı CDN, AVIF/WEBP dönüştürücü ve güvenli gizli yükleme altyapımız hizmetinizde.',
+      type: 'update',
+      badge: 'YENİ SÜRÜM',
       active: true,
       createdAt: new Date().toISOString(),
+      priority: 'high',
+      displayMode: 'banner',
+      linkUrl: '/upload',
+      linkText: 'Hemen Yükle',
+    },
+    {
+      id: 'ann-2',
+      title: 'Sınırsız & Ücretsiz Barındırma',
+      message: 'Tüm görselleriniz SSL korumalı hızlı sunucularımızda yüksek kalitede saklanır.',
+      type: 'success',
+      badge: 'BİLGİ',
+      active: true,
+      createdAt: new Date().toISOString(),
+      priority: 'normal',
+      displayMode: 'banner',
     },
   ];
   public dmcaNotices: DMCAData[] = [];

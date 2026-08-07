@@ -18,7 +18,7 @@ const SiteContext = createContext<SiteContextType | undefined>(undefined);
 
 export const SiteProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
   const [settings, setSettingsState] = useState<Partial<SiteSettings>>({
-    siteName: 'PicVault',
+    siteName: 'İnan Hızlı Medya',
     siteDescription: 'Hızlı ve güvenli görsel yükleme platformu',
     maxUploadSizeMB: 25,
   });

@@ -1,34 +1,53 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useSite } from '../context/SiteContext';
+import { AnnouncementDrawer } from './AnnouncementDrawer';
 import {
   Upload,
   Grid,
-  FileText,
-  Shield,
-  HelpCircle,
-  User,
   ShieldCheck,
   Menu,
   X,
   Sparkles,
   Info,
   Phone,
+  Bell,
 } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
   const location = useLocation();
   const { userProfile, isAdmin, logout } = useAuth();
-  const { settings } = useSite();
+  const { settings, announcements } = useSite();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [readAnnIds, setReadAnnIds] = useState<string[]>([]);
+
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem('read_announcement_ids') || '[]');
+      if (Array.isArray(saved)) {
+        setReadAnnIds(saved);
+      }
+    } catch {}
+  }, []);
+
+  const unreadCount = announcements.filter((a) => a.active && !readAnnIds.includes(a.id)).length;
+
+  const handleMarkAllRead = () => {
+    const allIds = announcements.map((a) => a.id);
+    setReadAnnIds(allIds);
+    try {
+      localStorage.setItem('read_announcement_ids', JSON.stringify(allIds));
+    } catch {}
+  };
 
   const isActive = (path: string) => location.pathname === path;
 
   const navLinks = [
     { name: 'Ana Sayfa', path: '/' },
     { name: 'Yükle', path: '/upload', icon: Upload, highlight: true },
-    { name: 'Galeri', path: '/galeri', icon: Grid },
+    { name: 'Görsellerim', path: '/profil', icon: Grid },
     { name: 'Hakkımızda', path: '/hakkimizda', icon: Info },
     { name: 'İletişim', path: '/iletisim', icon: Phone },
   ];
@@ -89,6 +108,20 @@ export const Navbar: React.FC = () => {
 
         {/* User Auth & Actions */}
         <div className="hidden md:flex items-center gap-3">
+          {/* Notification Bell */}
+          <button
+            onClick={() => setDrawerOpen(true)}
+            className="relative p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer"
+            title="Duyuru Merkezi"
+          >
+            <Bell className="w-5 h-5 text-slate-600" />
+            {unreadCount > 0 && (
+              <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-indigo-600 text-white text-[10px] font-black flex items-center justify-center border-2 border-white shadow-2xs animate-bounce">
+                {unreadCount}
+              </span>
+            )}
+          </button>
+
           {isAdmin && (
             <Link
               to="/admin"
@@ -114,7 +147,7 @@ export const Navbar: React.FC = () => {
               </Link>
               <button
                 onClick={logout}
-                className="text-xs text-slate-400 hover:text-slate-700 transition-colors px-2 py-1"
+                className="text-xs text-slate-400 hover:text-slate-700 transition-colors px-2 py-1 cursor-pointer"
               >
                 Çıkış
               </button>
@@ -137,8 +170,19 @@ export const Navbar: React.FC = () => {
           )}
         </div>
 
-        {/* Mobile Hamburger Toggle */}
+        {/* Mobile Hamburger Toggle & Bell */}
         <div className="flex items-center gap-2 md:hidden">
+          <button
+            onClick={() => setDrawerOpen(true)}
+            className="relative p-2 rounded-xl text-slate-700 hover:bg-slate-100 transition-colors"
+            title="Duyuru Merkezi"
+          >
+            <Bell className="w-5 h-5" />
+            {unreadCount > 0 && (
+              <span className="absolute top-0 right-0 w-2.5 h-2.5 rounded-full bg-indigo-600 animate-ping" />
+            )}
+          </button>
+
           <Link
             to="/upload"
             className="p-2 rounded-xl bg-slate-900 text-white flex items-center justify-center"
@@ -174,11 +218,29 @@ export const Navbar: React.FC = () => {
           ))}
 
           <div className="pt-4 border-t border-slate-200 space-y-2">
+            <button
+              onClick={() => {
+                setMobileMenuOpen(false);
+                setDrawerOpen(true);
+              }}
+              className="w-full flex items-center justify-between px-4 py-3 rounded-xl text-base font-semibold bg-indigo-50/70 text-indigo-700"
+            >
+              <span className="flex items-center gap-3">
+                <Bell className="w-5 h-5 text-indigo-600" />
+                Duyurular & Bildirimler
+              </span>
+              {unreadCount > 0 && (
+                <span className="px-2 py-0.5 rounded-full bg-indigo-600 text-white text-xs font-bold">
+                  {unreadCount} yeni
+                </span>
+              )}
+            </button>
+
             {isAdmin && (
               <Link
                 to="/admin"
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-semibold bg-indigo-50 text-indigo-700"
+                className="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-semibold bg-slate-100 text-slate-900"
               >
                 <ShieldCheck className="w-5 h-5" />
                 Admin Paneli
@@ -192,7 +254,7 @@ export const Navbar: React.FC = () => {
                   onClick={() => setMobileMenuOpen(false)}
                   className="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium text-slate-700 hover:bg-slate-50"
                 >
-                  <User className="w-5 h-5 text-slate-500" />
+                  <Grid className="w-5 h-5 text-slate-500" />
                   Profilim ({userProfile.displayName})
                 </Link>
                 <button
@@ -226,6 +288,14 @@ export const Navbar: React.FC = () => {
           </div>
         </div>
       )}
+
+      {/* Slide-over Notification Drawer */}
+      <AnnouncementDrawer
+        isOpen={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        readIds={readAnnIds}
+        onMarkAllRead={handleMarkAllRead}
+      />
     </header>
   );
 };

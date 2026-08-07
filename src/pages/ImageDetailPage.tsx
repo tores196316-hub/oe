@@ -74,7 +74,7 @@ export const ImageDetailPage: React.FC = () => {
       try {
         await navigator.share({
           title: image.title || image.fileName,
-          text: 'PicVault üzerinden resim detayını incele:',
+          text: 'İnan Hızlı Medya üzerinden resim detayını incele:',
           url: window.location.href,
         });
       } catch (err) {}

@@ -175,11 +175,22 @@ async function startServer() {
   app.get('/api/images', (req, res) => {
     let result = [...store.images];
 
-    // Filter by public or user
-    if (req.query.userId) {
-      result = result.filter((i) => i.userId === req.query.userId);
-    } else if (req.query.onlyPublic !== 'false') {
-      result = result.filter((i) => i.isPublic);
+    // Filter strictly by user, image IDs, or admin request
+    if (req.query.userId || req.query.userEmail) {
+      const uId = req.query.userId ? String(req.query.userId) : null;
+      const uEmail = req.query.userEmail ? String(req.query.userEmail).toLowerCase() : null;
+
+      result = result.filter(
+        (i) => (uId && i.userId === uId) || (uEmail && i.userEmail?.toLowerCase() === uEmail)
+      );
+    } else if (req.query.ids) {
+      const idsArr = String(req.query.ids).split(',');
+      result = result.filter((i) => idsArr.includes(i.id));
+    } else if (req.query.onlyAdmin === 'true' || req.query.onlyPublic === 'false') {
+      // Admin dashboard access - returns all images
+    } else {
+      // Public gallery is completely removed. Unauthenticated/global queries return empty.
+      result = [];
     }
 
     // Search query

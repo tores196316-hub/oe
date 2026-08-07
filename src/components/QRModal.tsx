@@ -44,7 +44,7 @@ export const QRModal: React.FC<QRModalProps> = ({ url, title, onClose }) => {
     if (!qrDataUrl) return;
     const a = document.createElement('a');
     a.href = qrDataUrl;
-    a.download = `picvault-qr-${Date.now()}.png`;
+    a.download = `inanhizlimedya-qr-${Date.now()}.png`;
     a.click();
     showToast('QR Kod indirildi', 'success');
   };

@@ -10,8 +10,8 @@ interface FAQItem {
 const faqs: FAQItem[] = [
   {
     category: 'Yükleme & Kullanım',
-    question: 'PicVault tamamen ücretsiz mi?',
-    answer: 'Evet! PicVault temel kullanımda tamamen ücretsizdir. Hiçbir gizli ücret veya kredi kartı tanımı gerektirmez.',
+    question: 'İnan Hızlı Medya tamamen ücretsiz mi?',
+    answer: 'Evet! İnan Hızlı Medya temel kullanımda tamamen ücretsizdir. Hiçbir gizli ücret veya kredi kartı tanımı gerektirmez.',
   },
   {
     category: 'Yükleme & Kullanım',
