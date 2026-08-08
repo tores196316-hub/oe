@@ -17,6 +17,7 @@ import {
   ShieldAlert,
   ArrowLeft,
   Sparkles,
+  Clock,
 } from 'lucide-react';
 import { ImageItem } from '../types';
 import { useToast } from '../context/ToastContext';
@@ -393,6 +394,24 @@ export const ImageDetailPage: React.FC = () => {
                 </span>
                 <span className="font-bold text-slate-800 dark:text-slate-200">{image.downloads}</span>
               </div>
+
+              {image.expiresAt ? (
+                <div className="flex items-center justify-between p-3 rounded-2xl bg-amber-50 dark:bg-amber-950/40 border border-amber-200/80 dark:border-amber-800/80 text-amber-900 dark:text-amber-200">
+                  <span className="flex items-center gap-2 font-bold text-xs">
+                    <Clock className="w-4 h-4 text-amber-600 dark:text-amber-400 shrink-0" /> Otomatik Silinme
+                  </span>
+                  <span className="font-extrabold font-mono text-[11px]">
+                    {new Date(image.expiresAt).toLocaleString('tr-TR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                  </span>
+                </div>
+              ) : (
+                <div className="flex items-center justify-between">
+                  <span className="text-slate-500 dark:text-slate-400 flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-indigo-600 dark:text-indigo-400" /> Geçerlilik
+                  </span>
+                  <span className="font-bold text-emerald-600 dark:text-emerald-400">Kalıcı / Süresiz</span>
+                </div>
+              )}
             </div>
 
             {/* Cloudinary CDN Status Badge */}

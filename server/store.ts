@@ -10,6 +10,7 @@ import {
   SystemStats,
   DMCAData,
   ContactData,
+  FeatureSuggestion,
 } from '../src/types/index.js';
 
 // Pre-seeded Turkish Blog Articles
@@ -175,6 +176,30 @@ class MemoryStore {
   ];
   public dmcaNotices: DMCAData[] = [];
   public contacts: ContactData[] = [];
+  public suggestions: FeatureSuggestion[] = [
+    {
+      id: 'sug-1',
+      title: 'Toplu indirme (ZIP olarak) seçeneği eklenmeli',
+      description: 'Yüklenen birden fazla görseli tek tıkla ZIP arşivi halinde indirme butonu olsa harika olur.',
+      category: 'feature',
+      authorName: 'Caner Y.',
+      authorEmail: 'caner@example.com',
+      createdAt: new Date(Date.now() - 86400000 * 2).toISOString(),
+      status: 'new',
+      upvotes: 12,
+    },
+    {
+      id: 'sug-2',
+      title: 'Resimlerin üzerine filigran (watermark) ekleme',
+      description: 'Görselleri yüklerken site logosu veya özel yazı ekleme aracı koyarsanız daha çok tercih edilir.',
+      category: 'feature',
+      authorName: 'Selin A.',
+      authorEmail: 'selin@example.com',
+      createdAt: new Date(Date.now() - 86400000 * 1).toISOString(),
+      status: 'planned',
+      upvotes: 8,
+    },
+  ];
 
   public adConfig: AdConfig = {
     popupEnabled: false,

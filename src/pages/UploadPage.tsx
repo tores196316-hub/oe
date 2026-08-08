@@ -18,6 +18,12 @@ import {
   ExternalLink,
   UserCheck,
   UserPlus,
+  Zap,
+  Clock,
+  Timer,
+  Calendar,
+  Infinity,
+  Hourglass,
 } from 'lucide-react';
 import { ImageItem } from '../types';
 import { useToast } from '../context/ToastContext';
@@ -42,10 +48,47 @@ export const UploadPage: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'page' | 'short_direct' | 'direct' | 'webp' | 'html' | 'markdown' | 'bbcode'>('short_direct');
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [qrModalUrl, setQrModalUrl] = useState<{ url: string; title: string } | null>(null);
+  const [aiTagResults, setAiTagResults] = useState<Record<string, any>>({});
+  const [aiTagLoadingId, setAiTagLoadingId] = useState<string | null>(null);
+  const [selectedExpireOption, setSelectedExpireOption] = useState<'never' | '1h' | '24h' | '7d' | '30d'>('never');
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { showToast } = useToast();
   const { userProfile } = useAuth();
+
+  const handleGenerateAiTags = async (item: FileQueueItem) => {
+    if (!item.result) return;
+    setAiTagLoadingId(item.id);
+    const startTime = performance.now();
+    try {
+      const res = await fetch('/api/ai/quick-tag', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          fileName: item.result.fileName,
+          title: item.result.title || item.result.fileName,
+          imageUrl: item.result.url,
+        }),
+      });
+      const data = await res.json();
+      const endTime = performance.now();
+      const latencyMs = Math.round(endTime - startTime);
+
+      if (data.success && data.result) {
+        setAiTagResults((prev) => ({
+          ...prev,
+          [item.id]: { ...data.result, latencyMs },
+        }));
+        showToast(`AI etiketleri ${latencyMs}ms içinde üretildi! (Gemini 3.1 Flash-Lite)`, 'success');
+      } else {
+        showToast(data.error || 'AI etiket üretilemedi', 'error');
+      }
+    } catch (err) {
+      showToast('AI servisine bağlanırken hata oluştu', 'error');
+    } finally {
+      setAiTagLoadingId(null);
+    }
+  };
 
   const maxAllowedFiles = userProfile ? 15 : 5;
 
@@ -133,6 +176,7 @@ export const UploadPage: React.FC = () => {
           const formData = new FormData();
           formData.append('images', optimizedFile);
           formData.append('isPublic', 'false');
+          formData.append('expireOption', selectedExpireOption);
           if (userProfile) {
             formData.append('userId', userProfile.uid);
             formData.append('userName', userProfile.displayName);
@@ -295,6 +339,59 @@ export const UploadPage: React.FC = () => {
         </span>
       </div>
 
+      {/* Auto Delete Timer Selector */}
+      <div className="p-5 rounded-2xl bg-white dark:bg-[#12131b] border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-3">
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2.5">
+            <div className="p-2 rounded-xl bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20">
+              <Clock className="w-4 h-4" />
+            </div>
+            <div>
+              <h3 className="text-sm font-extrabold text-slate-900 dark:text-white flex items-center gap-2">
+                Otomatik Silme Zamanlayıcısı
+                {selectedExpireOption !== 'never' && (
+                  <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-300 text-[10px] font-mono font-bold">
+                    Süreli Yükleme Aktif
+                  </span>
+                )}
+              </h3>
+              <p className="text-xs text-slate-500 dark:text-slate-400">Yüklenen resimlerinizin ne zaman kendiliğinden silineceğini seçin</p>
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 pt-1">
+          {[
+            { id: 'never', label: 'Kalıcı / Süresiz', desc: 'Hiçbir zaman silinmez', icon: Infinity },
+            { id: '1h', label: '1 Saat Sonra', desc: '60 dakika içinde silinir', icon: Timer },
+            { id: '24h', label: '24 Saat Sonra', desc: '1 gün sonra silinir', icon: Clock },
+            { id: '7d', label: '7 Gün Sonra', desc: '1 hafta sonra silinir', icon: Calendar },
+            { id: '30d', label: '30 Gün Sonra', desc: '1 ay sonra silinir', icon: Hourglass },
+          ].map((opt) => {
+            const IconComp = opt.icon;
+            const isSelected = selectedExpireOption === opt.id;
+            return (
+              <button
+                key={opt.id}
+                type="button"
+                onClick={() => setSelectedExpireOption(opt.id as any)}
+                className={`p-3 rounded-xl border text-left transition-all cursor-pointer relative overflow-hidden ${
+                  isSelected
+                    ? 'bg-gradient-to-br from-indigo-50/90 to-purple-50/60 dark:from-indigo-950/80 dark:to-purple-950/50 border-indigo-500 text-indigo-950 dark:text-indigo-100 ring-2 ring-indigo-500/30 shadow-xs'
+                    : 'bg-slate-50/80 dark:bg-slate-900/50 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800/80'
+                }`}
+              >
+                <div className="flex items-center gap-1.5 font-extrabold text-xs">
+                  <IconComp className={`w-3.5 h-3.5 ${isSelected ? 'text-indigo-600 dark:text-indigo-400' : 'text-slate-400'}`} />
+                  <span>{opt.label}</span>
+                </div>
+                <span className="text-[10px] text-slate-400 dark:text-slate-500 block mt-1 leading-tight">{opt.desc}</span>
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
       {/* Drag and Drop Zone */}
       <div
         onDragOver={(e) => {
@@ -374,9 +471,21 @@ export const UploadPage: React.FC = () => {
                         </span>
                       )}
                       {item.status === 'completed' && (
-                        <span className="text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
-                          <CheckCircle2 className="w-4 h-4 text-emerald-500 dark:text-emerald-400" /> Tamamlandı
-                        </span>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
+                            <CheckCircle2 className="w-4 h-4 text-emerald-500 dark:text-emerald-400" /> Tamamlandı
+                          </span>
+                          {item.result?.expiresAt ? (
+                            <span className="px-2.5 py-0.5 rounded-full bg-amber-500/10 border border-amber-500/20 text-amber-700 dark:text-amber-300 text-[10px] font-bold flex items-center gap-1">
+                              <Clock className="w-3 h-3 text-amber-500" />
+                              Silinme: {new Date(item.result.expiresAt).toLocaleString('tr-TR', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}
+                            </span>
+                          ) : (
+                            <span className="px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 text-[10px] font-medium flex items-center gap-1">
+                              <Infinity className="w-3 h-3 text-indigo-500" /> Kalıcı Görsel
+                            </span>
+                          )}
+                        </div>
                       )}
                       {item.status === 'error' && (
                         <span className="text-rose-600 dark:text-rose-400 font-semibold">{item.errorMessage || 'Hata'}</span>
@@ -505,18 +614,30 @@ export const UploadPage: React.FC = () => {
                     </div>
 
                     {/* Quick action triggers */}
-                    <div className="flex items-center justify-between text-xs pt-1">
-                      <button
-                        onClick={() =>
-                          setQrModalUrl({
-                            url: getPageUrl(item.result!.id),
-                            title: item.result!.fileName,
-                          })
-                        }
-                        className="flex items-center gap-1.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-semibold"
-                      >
-                        <QrCode className="w-4 h-4 text-indigo-600 dark:text-indigo-400" /> Sayfa QR Kodunu Üret
-                      </button>
+                    <div className="flex flex-wrap items-center justify-between gap-2 text-xs pt-1">
+                      <div className="flex items-center gap-3">
+                        <button
+                          onClick={() =>
+                            setQrModalUrl({
+                              url: getPageUrl(item.result!.id),
+                              title: item.result!.fileName,
+                            })
+                          }
+                          className="flex items-center gap-1.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-semibold cursor-pointer"
+                        >
+                          <QrCode className="w-4 h-4 text-indigo-600 dark:text-indigo-400" /> Sayfa QR Kodunu Üret
+                        </button>
+
+                        <button
+                          onClick={() => handleGenerateAiTags(item)}
+                          disabled={aiTagLoadingId === item.id}
+                          className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-500/20 font-bold transition-all cursor-pointer disabled:opacity-50"
+                          title="Gemini 3.1 Flash-Lite ile ultra hızlı SEO ve etiket üret"
+                        >
+                          <Zap className={`w-3.5 h-3.5 text-amber-500 ${aiTagLoadingId === item.id ? 'animate-spin' : ''}`} />
+                          {aiTagLoadingId === item.id ? 'Üretiliyor...' : '⚡ Flash AI Etiketle'}
+                        </button>
+                      </div>
 
                       <a
                         href={getPageUrl(item.result.id)}
@@ -527,6 +648,42 @@ export const UploadPage: React.FC = () => {
                         Sitedeki Resim Sayfasına Git <ExternalLink className="w-3.5 h-3.5" />
                       </a>
                     </div>
+
+                    {/* AI Tagging Low-Latency Result Box */}
+                    {aiTagResults[item.id] && (
+                      <div className="p-3 bg-gradient-to-r from-amber-500/5 via-indigo-500/5 to-purple-500/5 rounded-2xl border border-amber-500/20 space-y-2">
+                        <div className="flex items-center justify-between">
+                          <div className="flex items-center gap-2">
+                            <Zap className="w-4 h-4 text-amber-500" />
+                            <span className="text-xs font-black text-slate-900 dark:text-white">
+                              Flash AI SEO Önerisi
+                            </span>
+                            <span className="text-[10px] font-mono px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-600 dark:text-amber-300 font-bold">
+                              {aiTagResults[item.id].latencyMs}ms latency (Gemini 3.1 Flash-Lite)
+                            </span>
+                          </div>
+                        </div>
+
+                        <div className="text-xs space-y-1">
+                          <p className="font-bold text-slate-800 dark:text-slate-200">
+                            🎯 {aiTagResults[item.id].title}
+                          </p>
+                          <p className="text-slate-600 dark:text-slate-400 text-[11px]">
+                            {aiTagResults[item.id].description}
+                          </p>
+                          <div className="flex flex-wrap gap-1 pt-1">
+                            {aiTagResults[item.id].tags?.map((tag: string, tidx: number) => (
+                              <span
+                                key={tidx}
+                                className="px-2 py-0.5 rounded-md bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-[10px] text-slate-700 dark:text-slate-300 font-medium"
+                              >
+                                #{tag}
+                              </span>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

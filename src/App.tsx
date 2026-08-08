@@ -7,6 +7,7 @@ import { ThemeProvider } from './context/ThemeContext';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
 import { AnnouncementModal } from './components/AnnouncementModal';
+import { FlashAICopilot } from './components/FlashAICopilot';
 
 import { HomePage } from './pages/HomePage';
 import { UploadPage } from './pages/UploadPage';
@@ -50,6 +51,7 @@ export default function App() {
                     <Route path="/admin" element={<AdminDashboard />} />
                   </Routes>
                 </main>
+                <FlashAICopilot />
                 <Footer />
               </div>
             </SiteProvider>

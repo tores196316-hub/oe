@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext';
 import { useSite } from '../context/SiteContext';
 import { useTheme } from '../context/ThemeContext';
 import { AnnouncementDrawer } from './AnnouncementDrawer';
+import { FeatureSuggestionModal } from './FeatureSuggestionModal';
 import {
   Upload,
   Grid,
@@ -16,6 +17,7 @@ import {
   Bell,
   Sun,
   Moon,
+  Lightbulb,
 } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
@@ -25,6 +27,7 @@ export const Navbar: React.FC = () => {
   const { isDark, toggleTheme } = useTheme();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
+  const [suggestionModalOpen, setSuggestionModalOpen] = useState(false);
   const [readAnnIds, setReadAnnIds] = useState<string[]>([]);
 
   useEffect(() => {
@@ -112,6 +115,16 @@ export const Navbar: React.FC = () => {
 
         {/* User Auth & Actions */}
         <div className="hidden md:flex items-center gap-2.5">
+          {/* Feature Suggestion Trigger Button */}
+          <button
+            onClick={() => setSuggestionModalOpen(true)}
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-500/20 text-xs font-bold transition-all cursor-pointer"
+            title="Sitemizi birlikte geliştirelim! Özellik önerilerinizi iletin."
+          >
+            <Lightbulb className="w-3.5 h-3.5 text-amber-500 animate-pulse" />
+            Özellik İste
+          </button>
+
           {/* Dark / Light Mode Toggle Button */}
           <button
             onClick={toggleTheme}
@@ -325,6 +338,12 @@ export const Navbar: React.FC = () => {
         onClose={() => setDrawerOpen(false)}
         readIds={readAnnIds}
         onMarkAllRead={handleMarkAllRead}
+      />
+
+      {/* Feature Request & Suggestion Modal */}
+      <FeatureSuggestionModal
+        isOpen={suggestionModalOpen}
+        onClose={() => setSuggestionModalOpen(false)}
       />
     </header>
   );

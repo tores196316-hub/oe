@@ -4,6 +4,7 @@ import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import multer from 'multer';
 import path from 'path';
+import { GoogleGenAI, ThinkingLevel, Type } from '@google/genai';
 import { store } from './server/store.js';
 import {
   testCloudinaryConnection,
@@ -12,7 +13,30 @@ import {
   getCloudinaryClient,
 } from './server/cloudinary.js';
 import { generateSitemapXml, generateRobotsTxt } from './server/seo.js';
-import { ImageItem, BlogPost, DMCAData, ContactData } from './src/types/index.js';
+import { ImageItem, BlogPost, DMCAData, ContactData, FeatureSuggestion } from './src/types/index.js';
+
+// Periodic Auto-Expiration Cleanup Function
+function cleanupExpiredImages() {
+  const now = Date.now();
+  const initialCount = store.images.length;
+  store.images = store.images.filter((img) => {
+    if (img.expiresAt) {
+      const expTime = new Date(img.expiresAt).getTime();
+      if (now >= expTime) {
+        store.deletedImagesCount += 1;
+        return false;
+      }
+    }
+    return true;
+  });
+  const removed = initialCount - store.images.length;
+  if (removed > 0) {
+    console.log(`[AutoExpire] ${removed} adet süresi dolan resim sistemden otomatik temizlendi.`);
+  }
+}
+
+// Run auto-expire cleanup every 30 seconds
+setInterval(cleanupExpiredImages, 30000);
 
 async function startServer() {
   const app = express();
@@ -155,6 +179,20 @@ async function startServer() {
             originalUrl = base64;
           }
 
+          // Parse Expiration Timer Option
+          const expireOption = (req.body.expireOption as any) || 'never';
+          let expiresAt: string | undefined = undefined;
+          const nowMs = Date.now();
+          if (expireOption === '1h') {
+            expiresAt = new Date(nowMs + 3600 * 1000).toISOString();
+          } else if (expireOption === '24h') {
+            expiresAt = new Date(nowMs + 24 * 3600 * 1000).toISOString();
+          } else if (expireOption === '7d') {
+            expiresAt = new Date(nowMs + 7 * 24 * 3600 * 1000).toISOString();
+          } else if (expireOption === '30d') {
+            expiresAt = new Date(nowMs + 30 * 24 * 3600 * 1000).toISOString();
+          }
+
           const imageRecord: ImageItem = {
             id: fileId,
             publicId,
@@ -179,6 +217,8 @@ async function startServer() {
             views: 0,
             downloads: 0,
             deleteToken,
+            expireOption,
+            expiresAt,
             tags: req.body.tags ? String(req.body.tags).split(',').map((t) => t.trim()) : [],
           };
 
@@ -204,6 +244,7 @@ async function startServer() {
 
   // 2. Images Gallery Endpoint
   app.get('/api/images', (req, res) => {
+    cleanupExpiredImages();
     let result = [...store.images];
 
     // Filter strictly by user, image IDs, or admin request
@@ -261,6 +302,7 @@ async function startServer() {
 
   // 3. Single Image Details + Increment Views
   app.get('/api/images/:id', (req, res): void => {
+    cleanupExpiredImages();
     const img = store.images.find((i) => i.id === req.params.id);
     if (!img) {
       res.status(404).json({ error: 'Görsel bulunamadı.' });
@@ -272,6 +314,7 @@ async function startServer() {
 
   // Short Direct Image Link Route (/i/:id)
   app.get('/i/:id', (req, res): void => {
+    cleanupExpiredImages();
     const rawParam = req.params.id;
     const cleanId = rawParam.split('.')[0];
     const img = store.images.find((i) => i.id === cleanId || i.id === rawParam);
@@ -520,6 +563,149 @@ async function startServer() {
     };
     store.contacts.push(contact);
     res.json({ success: true, message: 'Mesajınız tarafımıza ulaştı.' });
+  });
+
+  // 13.1 Feature Suggestions & User Ideas API
+  app.get('/api/suggestions', (req, res) => {
+    res.json(store.suggestions || []);
+  });
+
+  app.post('/api/suggestions', (req, res): void => {
+    const { title, description, category = 'feature', authorName, authorEmail } = req.body;
+    if (!title || !description) {
+      res.status(400).json({ error: 'Lütfen öneri başlığı ve detayını girin.' });
+      return;
+    }
+    const suggestion: FeatureSuggestion = {
+      id: 'sug-' + Date.now(),
+      title,
+      description,
+      category,
+      authorName: authorName || 'Anonim Ziyaretçi',
+      authorEmail: authorEmail || '',
+      createdAt: new Date().toISOString(),
+      status: 'new',
+      upvotes: 1,
+    };
+    store.suggestions.unshift(suggestion);
+    res.json({ success: true, message: 'Öneriniz site yöneticisine başarıyla iletildi!', suggestion });
+  });
+
+  app.patch('/api/suggestions/:id', (req, res): void => {
+    const sug = store.suggestions.find((s) => s.id === req.params.id);
+    if (!sug) {
+      res.status(404).json({ error: 'Öneri bulunamadı.' });
+      return;
+    }
+    if (req.body.status) sug.status = req.body.status;
+    if (req.body.upvote) sug.upvotes = (sug.upvotes || 0) + 1;
+    res.json({ success: true, suggestion: sug });
+  });
+
+  app.delete('/api/suggestions/:id', (req, res): void => {
+    const idx = store.suggestions.findIndex((s) => s.id === req.params.id);
+    if (idx === -1) {
+      res.status(404).json({ error: 'Öneri bulunamadı.' });
+      return;
+    }
+    store.suggestions.splice(idx, 1);
+    res.json({ success: true, message: 'Öneri silindi.' });
+  });
+
+  // 13.5 Gemini 3.1 Flash-Lite Low-Latency AI Endpoints
+  const getGenAI = () => {
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) return null;
+    return new GoogleGenAI({
+      apiKey,
+      httpOptions: {
+        headers: {
+          'User-Agent': 'aistudio-build',
+        },
+      },
+    });
+  };
+
+  // Ultra-Fast Low-Latency Image Tag & SEO Generation Route
+  app.post('/api/ai/quick-tag', async (req, res): Promise<void> => {
+    try {
+      const ai = getGenAI();
+      if (!ai) {
+        res.status(500).json({ error: 'GEMINI_API_KEY bulunamadı.' });
+        return;
+      }
+
+      const { fileName = '', title = '', imageUrl = '' } = req.body;
+      const prompt = `Aşağıdaki görsel veya dosya adı için Türkçe dilinde ultra hızlı SEO başlığı, açıklama, 5 adet etiket ve alt metin üret:
+Dosya Adı: "${fileName}"
+Başlık: "${title}"
+${imageUrl ? `Görsel URL: ${imageUrl}` : ''}`;
+
+      const response = await ai.models.generateContent({
+        model: 'gemini-3.1-flash-lite',
+        contents: prompt,
+        config: {
+          thinkingConfig: { thinkingLevel: ThinkingLevel.MINIMAL },
+          responseMimeType: 'application/json',
+          responseSchema: {
+            type: Type.OBJECT,
+            properties: {
+              title: { type: Type.STRING, description: 'Önerilen SEO başlığı' },
+              description: { type: Type.STRING, description: 'Önerilen SEO açıklaması' },
+              tags: {
+                type: Type.ARRAY,
+                items: { type: Type.STRING },
+                description: '5 adet popüler etiket',
+              },
+              altText: { type: Type.STRING, description: 'Resim ALT metni' },
+              category: { type: Type.STRING, description: 'Önerilen kategori' },
+            },
+            required: ['title', 'description', 'tags', 'altText'],
+          },
+        },
+      });
+
+      const text = response.text || '{}';
+      const parsed = JSON.parse(text);
+      res.json({ success: true, model: 'gemini-3.1-flash-lite', result: parsed });
+    } catch (err: any) {
+      console.error('Gemini Flash-Lite Tag Error:', err);
+      res.status(500).json({ error: err.message || 'Hızlı AI etiketleme yanıt veremedi.' });
+    }
+  });
+
+  // Ultra-Fast Low-Latency AI Copilot / Quick Ask
+  app.post('/api/ai/ask', async (req, res): Promise<void> => {
+    try {
+      const ai = getGenAI();
+      if (!ai) {
+        res.status(500).json({ error: 'GEMINI_API_KEY bulunamadı.' });
+        return;
+      }
+
+      const { prompt = '', imageContext = '' } = req.body;
+      const systemInstruction = `Sen İnan Hızlı Medya resim yükleme platformunun ultra hızlı, yardımsever AI asistanısın (Gemini 3.1 Flash-Lite ile güçlendirilmiştir). Soruları kısa, net, samimi ve direkt Türkçe yanıtla.`;
+
+      const contents = imageContext ? `${imageContext}\n\nKullanıcı sorusu: ${prompt}` : prompt;
+
+      const response = await ai.models.generateContent({
+        model: 'gemini-3.1-flash-lite',
+        contents,
+        config: {
+          systemInstruction,
+          thinkingConfig: { thinkingLevel: ThinkingLevel.MINIMAL },
+        },
+      });
+
+      res.json({
+        success: true,
+        model: 'gemini-3.1-flash-lite',
+        answer: response.text || 'Yanıt üretilemedi.',
+      });
+    } catch (err: any) {
+      console.error('Gemini Flash-Lite Ask Error:', err);
+      res.status(500).json({ error: err.message || 'Hızlı AI asistanı yanıt veremedi.' });
+    }
   });
 
   // 14. SEO Endpoints

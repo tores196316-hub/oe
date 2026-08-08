@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../context/AuthContext';
 import { useToast } from '../context/ToastContext';
 import { useSite } from '../context/SiteContext';
-import { ImageItem, Announcement, SiteSettings, AdConfig } from '../types';
+import { ImageItem, Announcement, SiteSettings, AdConfig, FeatureSuggestion } from '../types';
 import {
   BarChart,
   Bar,
@@ -43,6 +43,8 @@ import {
   Cloud,
   Database,
   ArrowUpRight,
+  Lightbulb,
+  MessageSquare,
 } from 'lucide-react';
 
 export const AdminDashboard: React.FC = () => {
@@ -57,9 +59,11 @@ export const AdminDashboard: React.FC = () => {
     setAnnouncementsState,
   } = useSite();
 
-  const [activeTab, setActiveTab] = useState<'stats' | 'images' | 'announcements' | 'settings' | 'ads' | 'tests'>('stats');
+  const [activeTab, setActiveTab] = useState<'stats' | 'images' | 'suggestions' | 'announcements' | 'settings' | 'ads' | 'tests'>('stats');
 
   const [images, setImages] = useState<ImageItem[]>([]);
+  const [suggestions, setSuggestions] = useState<FeatureSuggestion[]>([]);
+  const [suggestionFilter, setSuggestionFilter] = useState<'all' | 'new' | 'planned' | 'completed'>('all');
   const [localSettings, setLocalSettings] = useState<Partial<SiteSettings>>(siteSettings);
   const [localAds, setLocalAds] = useState<Partial<AdConfig>>(adSettings);
 
@@ -111,10 +115,56 @@ export const AdminDashboard: React.FC = () => {
     fetchAdminImages();
   }, [fetchAdminImages]);
 
+  // Load suggestions
+  const fetchSuggestions = useCallback(async () => {
+    try {
+      const res = await fetch('/api/suggestions');
+      const data = await res.json();
+      if (Array.isArray(data)) {
+        setSuggestions(data);
+      }
+    } catch (err) {
+      console.warn('Suggestions fetch error:', err);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchSuggestions();
+  }, [fetchSuggestions]);
+
+  const handleUpdateSuggestionStatus = async (id: string, status: string) => {
+    try {
+      const res = await fetch(`/api/suggestions/${id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ status }),
+      });
+      if (res.ok) {
+        showToast('Öneri durumu güncellendi.', 'success');
+        fetchSuggestions();
+      }
+    } catch {
+      showToast('Güncellenemedi.', 'error');
+    }
+  };
+
+  const handleDeleteSuggestion = async (id: string) => {
+    try {
+      const res = await fetch(`/api/suggestions/${id}`, { method: 'DELETE' });
+      if (res.ok) {
+        showToast('Öneri silindi.', 'success');
+        fetchSuggestions();
+      }
+    } catch {
+      showToast('Silinemedi.', 'error');
+    }
+  };
+
   // Live refresh handler
   const handleManualRefresh = async () => {
     await refreshData();
     await fetchAdminImages();
+    await fetchSuggestions();
     setLastUpdated(new Date());
     showToast('Canlı veriler güncellendi!', 'success');
   };
@@ -456,6 +506,20 @@ export const AdminDashboard: React.FC = () => {
           }`}
         >
           <ImageIcon className="w-4 h-4" /> Resimler ({images.length})
+        </button>
+
+        <button
+          onClick={() => setActiveTab('suggestions')}
+          className={`px-4 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-2 shrink-0 transition-all ${
+            activeTab === 'suggestions'
+              ? 'bg-amber-500 text-slate-950 font-extrabold shadow-xs'
+              : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800'
+          }`}
+        >
+          <Lightbulb className="w-4 h-4 text-amber-500" /> İstek & Öneriler
+          <span className="px-1.5 py-0.2 bg-amber-600 text-white rounded-full text-[10px] font-bold">
+            {suggestions.filter((s) => s.status === 'new').length}
+          </span>
         </button>
 
         <button
@@ -1106,6 +1170,179 @@ export const AdminDashboard: React.FC = () => {
               </div>
             </div>
           )}
+        </div>
+      )}
+
+      {/* TAB: User Feature Suggestions & Ideas */}
+      {activeTab === 'suggestions' && (
+        <div className="space-y-6">
+          <div className="p-6 rounded-3xl bg-gradient-to-r from-amber-500/10 via-indigo-500/10 to-purple-500/10 border border-amber-500/20 space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="p-3 rounded-2xl bg-amber-500 text-slate-950 font-black shadow-md">
+                  <Lightbulb className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-black text-slate-900 dark:text-white flex items-center gap-2">
+                    Kullanıcı Özellik İletileri & Önerileri
+                    <span className="px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-700 dark:text-amber-300 text-[10px] font-extrabold">
+                      {suggestions.length} Öneri
+                    </span>
+                  </h3>
+                  <p className="text-xs text-slate-600 dark:text-slate-400">
+                    Ziyaretçilerinizin ve kullanıcılarınızın sitemizi geliştirmek için gönderdiği tüm istekler burada toplanır.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={fetchSuggestions}
+                  className="px-3.5 py-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold flex items-center gap-1.5 shadow-2xs hover:bg-slate-50 cursor-pointer"
+                >
+                  <RefreshCw className="w-3.5 h-3.5 text-amber-500" /> Önerileri Yenile
+                </button>
+              </div>
+            </div>
+
+            {/* Filter Buttons */}
+            <div className="flex items-center gap-2 pt-2 overflow-x-auto">
+              {[
+                { id: 'all', label: `Tümü (${suggestions.length})` },
+                { id: 'new', label: `Yeni Bekleyen (${suggestions.filter((s) => s.status === 'new').length})` },
+                { id: 'planned', label: `Planlandı (${suggestions.filter((s) => s.status === 'planned').length})` },
+                { id: 'completed', label: `Tamamlandı (${suggestions.filter((s) => s.status === 'completed').length})` },
+              ].map((f) => (
+                <button
+                  key={f.id}
+                  onClick={() => setSuggestionFilter(f.id as any)}
+                  className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer ${
+                    suggestionFilter === f.id
+                      ? 'bg-slate-900 text-white dark:bg-amber-500 dark:text-slate-950'
+                      : 'bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-400 hover:bg-slate-100'
+                  }`}
+                >
+                  {f.label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* List of Suggestions */}
+          <div className="space-y-3">
+            {suggestions
+              .filter((s) => suggestionFilter === 'all' || s.status === suggestionFilter)
+              .length === 0 ? (
+              <div className="p-12 text-center bg-white dark:bg-[#12131b] rounded-3xl border border-slate-200 dark:border-slate-800 space-y-2">
+                <MessageSquare className="w-10 h-10 text-slate-300 dark:text-slate-600 mx-auto" />
+                <p className="text-sm font-bold text-slate-700 dark:text-slate-300">Bu kategoride henüz öneri bulunmuyor.</p>
+                <p className="text-xs text-slate-400">Kullanıcılar "Özellik İste" butonu üzerinden öneri gönderdikçe burada görünecektir.</p>
+              </div>
+            ) : (
+              suggestions
+                .filter((s) => suggestionFilter === 'all' || s.status === suggestionFilter)
+                .map((sug) => {
+                  const categoryLabels: Record<string, string> = {
+                    feature: '💡 Yeni Özellik',
+                    design: '🎨 Tasarım',
+                    bug: '🐞 Hata Bildirimi',
+                    other: '📝 Diğer',
+                  };
+
+                  const statusColors: Record<string, string> = {
+                    new: 'bg-amber-500/10 text-amber-700 dark:text-amber-300 border-amber-500/30',
+                    planned: 'bg-indigo-500/10 text-indigo-700 dark:text-indigo-300 border-indigo-500/30',
+                    completed: 'bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 border-emerald-500/30',
+                    dismissed: 'bg-slate-500/10 text-slate-600 dark:text-slate-400 border-slate-500/30',
+                  };
+
+                  const statusTexts: Record<string, string> = {
+                    new: 'YENİ İSTEK',
+                    planned: 'YOL HARİTASINDA / PLANLANDI',
+                    completed: 'SİTEYE EKLENDİ / TAMAMLANDI',
+                    dismissed: 'ARŞİVLENDİ',
+                  };
+
+                  return (
+                    <div
+                      key={sug.id}
+                      className="p-5 bg-white dark:bg-[#12131b] rounded-2xl border border-slate-200/80 dark:border-slate-800 shadow-xs hover:border-amber-500/40 transition-all space-y-3"
+                    >
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                          <span className={`px-2.5 py-0.5 rounded-full text-[10px] font-black border ${statusColors[sug.status] || ''}`}>
+                            {statusTexts[sug.status] || sug.status}
+                          </span>
+                          <span className="px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 text-[11px] font-extrabold">
+                            {categoryLabels[sug.category] || sug.category}
+                          </span>
+                        </div>
+
+                        <span className="text-[11px] text-slate-400 font-medium">
+                          {new Date(sug.createdAt).toLocaleString('tr-TR', {
+                            day: 'numeric',
+                            month: 'long',
+                            year: 'numeric',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                          })}
+                        </span>
+                      </div>
+
+                      <div className="space-y-1">
+                        <h4 className="text-base font-extrabold text-slate-900 dark:text-white">
+                          {sug.title}
+                        </h4>
+                        <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed bg-slate-50 dark:bg-slate-900/50 p-3 rounded-xl border border-slate-100 dark:border-slate-800/80">
+                          {sug.description}
+                        </p>
+                      </div>
+
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-1 border-t border-slate-100 dark:border-slate-800/60">
+                        <div className="text-[11px] text-slate-500 dark:text-slate-400 flex items-center gap-2">
+                          <span className="font-bold text-slate-700 dark:text-slate-200">
+                            Gönderen: {sug.authorName || 'Anonim'}
+                          </span>
+                          {sug.authorEmail && (
+                            <span className="text-slate-400">({sug.authorEmail})</span>
+                          )}
+                        </div>
+
+                        <div className="flex items-center gap-1.5 flex-wrap">
+                          <button
+                            onClick={() => handleUpdateSuggestionStatus(sug.id, 'planned')}
+                            className={`px-2.5 py-1 rounded-lg text-[11px] font-bold border transition-all cursor-pointer ${
+                              sug.status === 'planned'
+                                ? 'bg-indigo-600 text-white border-indigo-600'
+                                : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-indigo-50 border-slate-200 dark:border-slate-700'
+                            }`}
+                          >
+                            Planlandı İşaretle
+                          </button>
+                          <button
+                            onClick={() => handleUpdateSuggestionStatus(sug.id, 'completed')}
+                            className={`px-2.5 py-1 rounded-lg text-[11px] font-bold border transition-all cursor-pointer ${
+                              sug.status === 'completed'
+                                ? 'bg-emerald-600 text-white border-emerald-600'
+                                : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-emerald-50 border-slate-200 dark:border-slate-700'
+                            }`}
+                          >
+                            Siteye Eklendi ✅
+                          </button>
+                          <button
+                            onClick={() => handleDeleteSuggestion(sug.id)}
+                            className="p-1.5 rounded-lg text-rose-500 hover:text-rose-700 hover:bg-rose-50 dark:hover:bg-rose-950/40 border border-transparent hover:border-rose-200 transition-all cursor-pointer"
+                            title="Öneriyi Sil"
+                          >
+                            <Trash2 className="w-3.5 h-3.5" />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })
+            )}
+          </div>
         </div>
       )}
 

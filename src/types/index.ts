@@ -22,6 +22,8 @@ export interface ImageItem {
   views: number;
   downloads: number;
   deleteToken?: string;
+  expireOption?: 'never' | '1h' | '24h' | '7d' | '30d';
+  expiresAt?: string;
   tags?: string[];
 }
 
@@ -150,3 +152,16 @@ export interface ContactData {
   message: string;
   createdAt?: string;
 }
+
+export interface FeatureSuggestion {
+  id: string;
+  title: string;
+  description: string;
+  category: 'feature' | 'design' | 'bug' | 'other';
+  authorName?: string;
+  authorEmail?: string;
+  createdAt: string;
+  status: 'new' | 'planned' | 'completed' | 'dismissed';
+  upvotes?: number;
+}
+
