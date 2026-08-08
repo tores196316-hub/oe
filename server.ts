@@ -631,7 +631,7 @@ async function startServer() {
     try {
       const ai = getGenAI();
       if (!ai) {
-        res.status(500).json({ error: 'GEMINI_API_KEY bulunamadı.' });
+        res.status(500).json({ error: 'GEMINI_API_KEY bulunamadı. Lütfen AI Studio panelindeki Ayarlar (Settings) menüsünden GEMINI_API_KEY ekleyin.' });
         return;
       }
 
@@ -679,7 +679,7 @@ ${imageUrl ? `Görsel URL: ${imageUrl}` : ''}`;
     try {
       const ai = getGenAI();
       if (!ai) {
-        res.status(500).json({ error: 'GEMINI_API_KEY bulunamadı.' });
+        res.status(500).json({ error: 'GEMINI_API_KEY bulunamadı. Lütfen AI Studio panelindeki Ayarlar (Settings) menüsünden GEMINI_API_KEY ekleyin.' });
         return;
       }
 
