@@ -33,7 +33,12 @@ export async function testCloudinaryConnection(config?: { cloudName?: string; ap
     const result = await client.api.ping();
     return {
       success: true,
-      message: 'Cloudinary API bağlantısı başarılı! STATUS: ' + (result.status || 'ok'),
+      message: 'Cloudinary API ve Otomatik WebP/Kalite Optimizasyonu Aktif! STATUS: ' + (result.status || 'ok'),
+      optimization: {
+        webpEnabled: true,
+        autoQualityEnabled: true,
+        defaultFormat: 'webp (f_auto, q_auto)',
+      },
       details: result,
     };
   } catch (error: any) {
@@ -44,7 +49,7 @@ export async function testCloudinaryConnection(config?: { cloudName?: string; ap
   }
 }
 
-// Upload buffer directly to Cloudinary
+// Upload buffer directly to Cloudinary with automatic WebP format & quality optimization
 export async function uploadToCloudinary(
   fileBuffer: Buffer,
   fileName: string,
@@ -52,6 +57,9 @@ export async function uploadToCloudinary(
 ): Promise<{
   publicId: string;
   secureUrl: string;
+  webpUrl: string;
+  optimizedUrl: string;
+  originalUrl: string;
   thumbnailUrl: string;
   format: string;
   width: number;
@@ -61,7 +69,7 @@ export async function uploadToCloudinary(
   const { isConfigured, cloudinary: client } = getCloudinaryClient();
 
   if (!isConfigured) {
-    // If Cloudinary keys are not provided yet in env, throw informative error or create optimized mock response
+    // If Cloudinary keys are not provided yet in env, throw informative error
     throw new Error('CLOUDINARY_NOT_CONFIGURED');
   }
 
@@ -75,11 +83,32 @@ export async function uploadToCloudinary(
         resource_type: 'auto',
         use_filename: true,
         unique_filename: true,
+        transformation: [{ fetch_format: 'auto', quality: 'auto' }],
+        eager: [
+          { format: 'webp', quality: 'auto:good' },
+          { width: 400, height: 300, crop: 'fill', gravity: 'auto', format: 'webp', quality: 'auto' },
+        ],
+        eager_async: false,
       },
       (error, result) => {
         if (error || !result) {
           return reject(error || new Error('Upload failed'));
         }
+
+        // Generate optimized auto-format (f_auto) and auto-quality (q_auto) URL
+        // Cloudinary f_auto delivers WebP to WebP-capable browsers automatically
+        const optimizedUrl = client.url(result.public_id, {
+          fetch_format: 'auto',
+          quality: 'auto',
+          secure: true,
+        });
+
+        // Generate explicit WebP format URL
+        const webpUrl = client.url(result.public_id, {
+          format: 'webp',
+          quality: 'auto:good',
+          secure: true,
+        });
 
         // Generate optimized webp thumbnail URL
         const thumbnailUrl = client.url(result.public_id, {
@@ -94,9 +123,12 @@ export async function uploadToCloudinary(
 
         resolve({
           publicId: result.public_id,
-          secureUrl: result.secure_url,
-          thumbnailUrl: thumbnailUrl || result.secure_url,
-          format: result.format || 'jpg',
+          secureUrl: optimizedUrl || webpUrl || result.secure_url,
+          webpUrl: webpUrl || result.secure_url,
+          optimizedUrl: optimizedUrl || result.secure_url,
+          originalUrl: result.secure_url,
+          thumbnailUrl: thumbnailUrl || webpUrl || result.secure_url,
+          format: 'webp',
           width: result.width || 800,
           height: result.height || 600,
           size: result.bytes || fileBuffer.length,

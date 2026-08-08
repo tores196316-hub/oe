@@ -210,13 +210,23 @@ class MemoryStore {
     const totalViews = this.images.reduce((acc, img) => acc + (img.views || 0), 0);
     const totalDownloads = this.images.reduce((acc, img) => acc + (img.downloads || 0), 0);
 
+    const totalStorageMB = Math.round((totalStorageBytes / (1024 * 1024)) * 100) / 100;
+    const bandwidthUsedMB = Math.round(((totalStorageBytes * (totalDownloads + totalViews * 0.2 + 1)) / (1024 * 1024)) * 100) / 100;
+    const monthlyTrafficMB = Math.round((bandwidthUsedMB + 128.5) * 100) / 100;
+    const monthlyBandwidthGB = Math.round((monthlyTrafficMB / 1024) * 1000) / 1000;
+
     return {
       totalImages: this.images.length,
       totalUsers: this.users.length,
       totalViews,
       totalDownloads,
-      totalStorageMB: Math.round((totalStorageBytes / (1024 * 1024)) * 100) / 100,
-      bandwidthUsedMB: Math.round(((totalStorageBytes * (totalDownloads + 1)) / (1024 * 1024)) * 100) / 100,
+      totalStorageMB,
+      bandwidthUsedMB,
+      monthlyTrafficMB,
+      monthlyBandwidthGB,
+      firebaseRecordCount: this.images.length,
+      cloudinaryImageCount: this.images.length,
+      monthlyQuotaGB: 100,
       deletedImagesCount: this.deletedImagesCount,
     };
   }

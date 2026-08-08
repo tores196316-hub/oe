@@ -30,7 +30,7 @@ export const ImageDetailPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [activeEmbed, setActiveEmbed] = useState<'page' | 'direct' | 'html' | 'markdown' | 'bbcode'>('page');
+  const [activeEmbed, setActiveEmbed] = useState<'page' | 'direct' | 'webp' | 'html' | 'markdown' | 'bbcode'>('page');
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [qrModalOpen, setQrModalOpen] = useState(false);
@@ -146,17 +146,20 @@ export const ImageDetailPage: React.FC = () => {
 
   const getEmbedCode = () => {
     if (!image) return '';
+    const imgUrl = image.webpUrl || image.url;
     switch (activeEmbed) {
       case 'page':
         return sitePageUrl;
       case 'direct':
         return image.url;
+      case 'webp':
+        return image.webpUrl || image.url;
       case 'html':
-        return `<a href="${sitePageUrl}" target="_blank"><img src="${image.url}" alt="${image.title || image.fileName}" /></a>`;
+        return `<a href="${sitePageUrl}" target="_blank"><img src="${imgUrl}" alt="${image.title || image.fileName}" /></a>`;
       case 'markdown':
-        return `[![${image.title || image.fileName}](${image.url})](${sitePageUrl})`;
+        return `[![${image.title || image.fileName}](${imgUrl})](${sitePageUrl})`;
       case 'bbcode':
-        return `[url=${sitePageUrl}][img]${image.url}[/img][/url]`;
+        return `[url=${sitePageUrl}][img]${imgUrl}[/img][/url]`;
     }
   };
 
@@ -275,6 +278,14 @@ export const ImageDetailPage: React.FC = () => {
                 Direkt Link
               </button>
               <button
+                onClick={() => setActiveEmbed('webp')}
+                className={`text-xs font-bold px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1 ${
+                  activeEmbed === 'webp' ? 'bg-emerald-600 text-white shadow-xs' : 'text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100'
+                }`}
+              >
+                ⚡ WebP Link (Optimize)
+              </button>
+              <button
                 onClick={() => setActiveEmbed('html')}
                 className={`text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors ${
                   activeEmbed === 'html' ? 'bg-slate-900 dark:bg-slate-700 text-white' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
@@ -384,21 +395,21 @@ export const ImageDetailPage: React.FC = () => {
       {/* Delete Confirmation Modal */}
       {deleteModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-          <div className="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl border border-slate-100 space-y-4">
-            <h3 className="font-bold text-lg text-slate-900">Resmi Silmek İstiyor musunuz?</h3>
-            <p className="text-xs text-slate-500">
+          <div className="bg-white dark:bg-[#12131b] rounded-3xl p-6 max-w-sm w-full shadow-2xl border border-slate-100 dark:border-slate-800 space-y-4">
+            <h3 className="font-bold text-lg text-slate-900 dark:text-white">Resmi Silmek İstiyor musunuz?</h3>
+            <p className="text-xs text-slate-500 dark:text-slate-400">
               Bu işlem resmi sunucularımızdan ve Cloudinary CDN üzerinden kalıcı olarak silecektir.
             </p>
             <div className="flex items-center justify-end gap-2 pt-2">
               <button
                 onClick={() => setDeleteModalOpen(false)}
-                className="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 text-slate-700"
+                className="px-4 py-2 rounded-xl text-xs font-semibold bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 transition-colors cursor-pointer"
               >
                 İptal
               </button>
               <button
                 onClick={handleDelete}
-                className="px-4 py-2 rounded-xl text-xs font-semibold bg-rose-600 hover:bg-rose-700 text-white shadow-xs"
+                className="px-4 py-2 rounded-xl text-xs font-semibold bg-rose-600 hover:bg-rose-700 text-white shadow-xs cursor-pointer"
               >
                 Evet, Sil
               </button>

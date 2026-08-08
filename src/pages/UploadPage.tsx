@@ -39,7 +39,7 @@ export const UploadPage: React.FC = () => {
   const [queue, setQueue] = useState<FileQueueItem[]>([]);
   const [isDragOver, setIsDragOver] = useState(false);
   const [isPublic, setIsPublic] = useState(true);
-  const [activeTab, setActiveTab] = useState<'page' | 'direct' | 'html' | 'markdown' | 'bbcode'>('page');
+  const [activeTab, setActiveTab] = useState<'page' | 'direct' | 'webp' | 'html' | 'markdown' | 'bbcode'>('page');
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [qrModalUrl, setQrModalUrl] = useState<{ url: string; title: string } | null>(null);
 
@@ -227,17 +227,20 @@ export const UploadPage: React.FC = () => {
 
   const getEmbedCode = (itemResult: ImageItem) => {
     const pageUrl = getPageUrl(itemResult.id);
+    const directUrl = itemResult.webpUrl || itemResult.url;
     switch (activeTab) {
       case 'page':
         return pageUrl;
       case 'direct':
         return itemResult.url;
+      case 'webp':
+        return itemResult.webpUrl || itemResult.url;
       case 'html':
-        return `<a href="${pageUrl}" target="_blank"><img src="${itemResult.url}" alt="${itemResult.fileName}" /></a>`;
+        return `<a href="${pageUrl}" target="_blank"><img src="${directUrl}" alt="${itemResult.fileName}" /></a>`;
       case 'markdown':
-        return `[![${itemResult.fileName}](${itemResult.url})](${pageUrl})`;
+        return `[![${itemResult.fileName}](${directUrl})](${pageUrl})`;
       case 'bbcode':
-        return `[url=${pageUrl}][img]${itemResult.url}[/img][/url]`;
+        return `[url=${pageUrl}][img]${directUrl}[/img][/url]`;
     }
   };
 
@@ -427,6 +430,14 @@ export const UploadPage: React.FC = () => {
                         }`}
                       >
                         Direkt Resim
+                      </button>
+                      <button
+                        onClick={() => setActiveTab('webp')}
+                        className={`text-xs font-bold px-3 py-1 rounded-lg transition-colors flex items-center gap-1 ${
+                          activeTab === 'webp' ? 'bg-emerald-600 text-white shadow-xs' : 'text-emerald-700 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/60 hover:bg-emerald-100'
+                        }`}
+                      >
+                        ⚡ WebP Format (Optimize)
                       </button>
                       <button
                         onClick={() => setActiveTab('html')}

@@ -114,6 +114,9 @@ async function startServer() {
 
           let secureUrl = '';
           let thumbnailUrl = '';
+          let webpUrl = '';
+          let optimizedUrl = '';
+          let originalUrl = '';
           let publicId = `picvault/uploads/${fileId}`;
           let format = ext;
           let width = 1200;
@@ -123,10 +126,13 @@ async function startServer() {
           if (isConfigured) {
             try {
               const cloudRes = await uploadToCloudinary(file.buffer, file.originalname, customFolder);
-              secureUrl = cloudRes.secureUrl;
+              secureUrl = cloudRes.optimizedUrl || cloudRes.webpUrl || cloudRes.secureUrl;
               thumbnailUrl = cloudRes.thumbnailUrl;
+              webpUrl = cloudRes.webpUrl;
+              optimizedUrl = cloudRes.optimizedUrl;
+              originalUrl = cloudRes.originalUrl;
               publicId = cloudRes.publicId;
-              format = cloudRes.format;
+              format = cloudRes.format || 'webp';
               width = cloudRes.width;
               height = cloudRes.height;
               size = cloudRes.size;
@@ -135,12 +141,18 @@ async function startServer() {
               const base64 = `data:${file.mimetype};base64,${file.buffer.toString('base64')}`;
               secureUrl = base64;
               thumbnailUrl = base64;
+              webpUrl = base64;
+              optimizedUrl = base64;
+              originalUrl = base64;
             }
           } else {
             // Fallback to high-speed inline Data URL when Cloudinary keys are not yet entered in Admin Panel or .env
             const base64 = `data:${file.mimetype};base64,${file.buffer.toString('base64')}`;
             secureUrl = base64;
             thumbnailUrl = base64;
+            webpUrl = base64;
+            optimizedUrl = base64;
+            originalUrl = base64;
           }
 
           const imageRecord: ImageItem = {
@@ -148,6 +160,9 @@ async function startServer() {
             publicId,
             url: secureUrl,
             thumbnailUrl,
+            webpUrl: webpUrl || secureUrl,
+            optimizedUrl: optimizedUrl || secureUrl,
+            originalUrl: originalUrl || secureUrl,
             title: req.body.title || file.originalname.split('.')[0],
             description: req.body.description || '',
             fileName: file.originalname,

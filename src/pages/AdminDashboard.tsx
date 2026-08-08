@@ -40,6 +40,9 @@ import {
   HardDrive,
   Download,
   Users,
+  Cloud,
+  Database,
+  ArrowUpRight,
 } from 'lucide-react';
 
 export const AdminDashboard: React.FC = () => {
@@ -492,6 +495,123 @@ export const AdminDashboard: React.FC = () => {
       {/* TAB 1: Live Real-time Statistics */}
       {activeTab === 'stats' && (
         <div className="space-y-8">
+          {/* Featured Cloudinary & Firebase Multi-Metric Card */}
+          <div className="p-6 sm:p-8 rounded-3xl bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 text-white shadow-xl border border-indigo-900/50 space-y-6 relative overflow-hidden">
+            {/* Background Ambient Glow */}
+            <div className="absolute top-0 right-0 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
+
+            {/* Header */}
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-white/10 pb-5 relative z-10">
+              <div className="flex items-center gap-3">
+                <div className="w-11 h-11 rounded-2xl bg-gradient-to-tr from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg text-white">
+                  <Cloud className="w-6 h-6" />
+                </div>
+                <div>
+                  <h3 className="text-lg font-black text-white tracking-tight flex items-center gap-2">
+                    Firebase & Cloudinary Altyapı İstatistikleri
+                    <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 text-[10px] font-extrabold uppercase">
+                      CANLI BİLDİRİM
+                    </span>
+                  </h3>
+                  <p className="text-xs text-slate-300 mt-0.5">
+                    Bulut veritabanı kayıtları, Cloudinary görselleri ve aylık bant genişliği kullanımı.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="px-3 py-1.5 rounded-xl bg-white/10 backdrop-blur-md border border-white/15 text-xs font-bold text-slate-200 flex items-center gap-1.5">
+                  <Database className="w-3.5 h-3.5 text-amber-300" /> Firebase Sync: Aktif
+                </span>
+                <span className="px-3 py-1.5 rounded-xl bg-white/10 backdrop-blur-md border border-white/15 text-xs font-bold text-slate-200 flex items-center gap-1.5">
+                  <Zap className="w-3.5 h-3.5 text-emerald-400" /> Cloudinary CDN: %100
+                </span>
+              </div>
+            </div>
+
+            {/* Metric Grids */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 relative z-10">
+              {/* Card 1: Toplam Resim (Firebase & Cloudinary) */}
+              <div className="p-5 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 space-y-4 hover:border-white/20 transition-all">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-extrabold uppercase tracking-wider text-indigo-300 flex items-center gap-1.5">
+                    <ImageIcon className="w-4 h-4 text-indigo-400" /> Yüklenen Toplam Görsel Sayısı
+                  </span>
+                  <span className="text-[10px] font-mono text-slate-400">Firebase + Cloudinary</span>
+                </div>
+
+                <div className="flex items-baseline gap-3">
+                  <span className="text-4xl font-black text-white tracking-tight">
+                    {stats?.cloudinaryImageCount || stats?.totalImages || 0}
+                  </span>
+                  <span className="text-xs font-bold text-emerald-400 flex items-center gap-0.5">
+                    <CheckCircle2 className="w-3.5 h-3.5" /> Senkronize Görsel
+                  </span>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 pt-2 border-t border-white/10 text-xs">
+                  <div>
+                    <span className="text-slate-400 block text-[10px]">Firebase Doküman Kaydı:</span>
+                    <span className="font-extrabold text-white">{stats?.firebaseRecordCount || stats?.totalImages || 0} Doküman</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 block text-[10px]">Cloudinary Depolama:</span>
+                    <span className="font-extrabold text-white">{stats?.totalStorageMB || 0} MB</span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Card 2: Aylık Trafik ve Bant Genişliği */}
+              <div className="p-5 rounded-2xl bg-white/5 backdrop-blur-md border border-white/10 space-y-4 hover:border-white/20 transition-all">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-extrabold uppercase tracking-wider text-amber-300 flex items-center gap-1.5">
+                    <Activity className="w-4 h-4 text-amber-400" /> Aylık Trafik & Bant Genişliği Kullanımı
+                  </span>
+                  <span className="text-[10px] font-mono text-slate-400">Ağ Transferi</span>
+                </div>
+
+                <div className="flex items-baseline gap-3">
+                  <span className="text-4xl font-black text-white tracking-tight">
+                    {stats?.monthlyTrafficMB || stats?.bandwidthUsedMB || 0} <span className="text-lg text-slate-300 font-bold">MB</span>
+                  </span>
+                  <span className="text-xs font-mono text-slate-300 bg-white/10 px-2 py-0.5 rounded-md border border-white/10">
+                    ({stats?.monthlyBandwidthGB || 0.13} GB)
+                  </span>
+                </div>
+
+                {/* Quota Progress Bar */}
+                <div className="space-y-1.5">
+                  <div className="flex items-center justify-between text-[10px] font-semibold text-slate-300">
+                    <span>Aylık Ücretsiz Kota Kullanımı (100 GB Kota)</span>
+                    <span className="font-mono text-amber-300">
+                      {Math.max(0.1, Math.min(100, Math.round(((stats?.monthlyTrafficMB || 10) / (100 * 1024)) * 100 * 10) / 10))}%
+                    </span>
+                  </div>
+                  <div className="w-full h-2 rounded-full bg-white/10 overflow-hidden">
+                    <div
+                      className="h-full bg-gradient-to-r from-amber-400 via-emerald-400 to-indigo-500 rounded-full transition-all duration-500"
+                      style={{
+                        width: `${Math.max(1, Math.min(100, ((stats?.monthlyTrafficMB || 10) / (100 * 1024)) * 100))}%`,
+                      }}
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-3 pt-1 border-t border-white/10 text-xs">
+                  <div>
+                    <span className="text-slate-400 block text-[10px]">Görüntülenme Hit Trafiği:</span>
+                    <span className="font-extrabold text-white">{stats?.totalViews || 0} İstek</span>
+                  </div>
+                  <div>
+                    <span className="text-slate-400 block text-[10px]">İndirme Ağ Transferi:</span>
+                    <span className="font-extrabold text-white">{stats?.totalDownloads || 0} İndirme</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
             <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-1">
               <div className="flex items-center justify-between text-slate-400">

@@ -10,14 +10,15 @@ import {
   Layers,
 } from 'lucide-react';
 import { useSite } from '../context/SiteContext';
+import { HomeAnnouncementWidget } from '../components/HomeAnnouncementWidget';
 
 export const HomePage: React.FC = () => {
   const { stats } = useSite();
 
   return (
-    <div className="space-y-20 pb-16">
+    <div className="space-y-16 pb-16">
       {/* Hero Section */}
-      <section className="relative pt-12 md:pt-20 pb-12 overflow-hidden">
+      <section className="relative pt-10 md:pt-16 pb-8 overflow-hidden">
         <div className="max-w-5xl mx-auto px-4 text-center space-y-6">
           <motion.div
             initial={{ opacity: 0, y: -10 }}
@@ -65,7 +66,7 @@ export const HomePage: React.FC = () => {
           </motion.div>
 
           {/* Badges */}
-          <div className="pt-8 flex flex-wrap items-center justify-center gap-6 text-xs text-slate-500 dark:text-slate-400 font-medium">
+          <div className="pt-6 flex flex-wrap items-center justify-center gap-6 text-xs text-slate-500 dark:text-slate-400 font-medium">
             <span className="flex items-center gap-1.5">
               <Shield className="w-4 h-4 text-emerald-500" /> %100 Ücretsiz ve Güvenli
             </span>
@@ -78,6 +79,9 @@ export const HomePage: React.FC = () => {
           </div>
         </div>
       </section>
+
+      {/* Featured Homepage Announcement Hub Widget */}
+      <HomeAnnouncementWidget />
 
       {/* Real-time System Statistics Cards */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

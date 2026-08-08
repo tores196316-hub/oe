@@ -3,6 +3,9 @@ export interface ImageItem {
   publicId: string;
   url: string;
   thumbnailUrl: string;
+  webpUrl?: string;
+  optimizedUrl?: string;
+  originalUrl?: string;
   title?: string;
   description?: string;
   fileName: string;
@@ -119,6 +122,11 @@ export interface SystemStats {
   totalDownloads: number;
   totalStorageMB: number;
   bandwidthUsedMB: number;
+  monthlyTrafficMB?: number;
+  monthlyBandwidthGB?: number;
+  firebaseRecordCount?: number;
+  cloudinaryImageCount?: number;
+  monthlyQuotaGB?: number;
   deletedImagesCount: number;
 }
 
