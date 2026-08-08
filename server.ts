@@ -270,6 +270,35 @@ async function startServer() {
     res.json(img);
   });
 
+  // Short Direct Image Link Route (/i/:id)
+  app.get('/i/:id', (req, res): void => {
+    const rawParam = req.params.id;
+    const cleanId = rawParam.split('.')[0];
+    const img = store.images.find((i) => i.id === cleanId || i.id === rawParam);
+
+    if (!img) {
+      res.status(404).send('Görsel bulunamadı');
+      return;
+    }
+
+    img.views += 1;
+    const targetUrl = (req.query.format === 'webp' || rawParam.endsWith('.webp')) ? (img.webpUrl || img.url) : img.url;
+
+    if (targetUrl.startsWith('data:')) {
+      const matches = targetUrl.match(/^data:(.+);base64,(.+)$/);
+      if (matches) {
+        const contentType = matches[1];
+        const buffer = Buffer.from(matches[2], 'base64');
+        res.setHeader('Content-Type', contentType);
+        res.setHeader('Cache-Control', 'public, max-age=31536000');
+        res.send(buffer);
+        return;
+      }
+    }
+
+    res.redirect(302, targetUrl);
+  });
+
   // 4. Increment Downloads
   app.post('/api/images/:id/download', (req, res): void => {
     const img = store.images.find((i) => i.id === req.params.id);

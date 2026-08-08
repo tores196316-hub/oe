@@ -30,7 +30,7 @@ export const ImageDetailPage: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [isFullscreen, setIsFullscreen] = useState(false);
-  const [activeEmbed, setActiveEmbed] = useState<'page' | 'direct' | 'webp' | 'html' | 'markdown' | 'bbcode'>('page');
+  const [activeEmbed, setActiveEmbed] = useState<'page' | 'short_direct' | 'direct' | 'webp' | 'html' | 'markdown' | 'bbcode'>('short_direct');
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [deleteModalOpen, setDeleteModalOpen] = useState(false);
   const [qrModalOpen, setQrModalOpen] = useState(false);
@@ -82,7 +82,7 @@ export const ImageDetailPage: React.FC = () => {
       } catch (err) {}
     } else {
       navigator.clipboard.writeText(window.location.href);
-      showToast('Sayfa adresi kopyalandı!', 'success');
+      showToast('Link panoya kopyalandı!', 'success');
     }
   };
 
@@ -113,7 +113,7 @@ export const ImageDetailPage: React.FC = () => {
   const copyCode = (text: string, key: string) => {
     navigator.clipboard.writeText(text);
     setCopiedKey(key);
-    showToast('Kopyalandı!', 'success');
+    showToast('Link panoya kopyalandı!', 'success');
     setTimeout(() => setCopiedKey(null), 2000);
   };
 
@@ -143,23 +143,25 @@ export const ImageDetailPage: React.FC = () => {
   }
 
   const sitePageUrl = image ? `${window.location.origin}/resim/${image.id}` : '';
+  const shortDirectUrl = image ? `${window.location.origin}/i/${image.id}` : '';
 
   const getEmbedCode = () => {
     if (!image) return '';
-    const imgUrl = image.webpUrl || image.url;
     switch (activeEmbed) {
+      case 'short_direct':
+        return shortDirectUrl;
       case 'page':
         return sitePageUrl;
       case 'direct':
         return image.url;
       case 'webp':
-        return image.webpUrl || image.url;
+        return image.webpUrl || shortDirectUrl;
       case 'html':
-        return `<a href="${sitePageUrl}" target="_blank"><img src="${imgUrl}" alt="${image.title || image.fileName}" /></a>`;
+        return `<a href="${sitePageUrl}" target="_blank"><img src="${shortDirectUrl}" alt="${image.title || image.fileName}" /></a>`;
       case 'markdown':
-        return `[![${image.title || image.fileName}](${imgUrl})](${sitePageUrl})`;
+        return `[![${image.title || image.fileName}](${shortDirectUrl})](${sitePageUrl})`;
       case 'bbcode':
-        return `[url=${sitePageUrl}][img]${imgUrl}[/img][/url]`;
+        return `[url=${sitePageUrl}][img]${shortDirectUrl}[/img][/url]`;
     }
   };
 
@@ -262,20 +264,30 @@ export const ImageDetailPage: React.FC = () => {
 
             <div className="flex flex-wrap items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-2">
               <button
-                onClick={() => setActiveEmbed('page')}
-                className={`text-xs font-bold px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1 ${
-                  activeEmbed === 'page' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                onClick={() => setActiveEmbed('short_direct')}
+                className={`text-xs font-bold px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1 cursor-pointer ${
+                  activeEmbed === 'short_direct'
+                    ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-xs'
+                    : 'text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100'
                 }`}
               >
-                Site Sayfa Linki
+                🔥 Kısa Direkt Link
+              </button>
+              <button
+                onClick={() => setActiveEmbed('page')}
+                className={`text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors cursor-pointer ${
+                  activeEmbed === 'page' ? 'bg-slate-900 dark:bg-slate-700 text-white' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
+                }`}
+              >
+                Sayfa Linki
               </button>
               <button
                 onClick={() => setActiveEmbed('direct')}
-                className={`text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors ${
+                className={`text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors cursor-pointer ${
                   activeEmbed === 'direct' ? 'bg-slate-900 dark:bg-slate-700 text-white' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
                 }`}
               >
-                Direkt Link
+                CDN Ham Link
               </button>
               <button
                 onClick={() => setActiveEmbed('webp')}

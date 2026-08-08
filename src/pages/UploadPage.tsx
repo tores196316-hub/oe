@@ -39,7 +39,7 @@ export const UploadPage: React.FC = () => {
   const [queue, setQueue] = useState<FileQueueItem[]>([]);
   const [isDragOver, setIsDragOver] = useState(false);
   const [isPublic, setIsPublic] = useState(true);
-  const [activeTab, setActiveTab] = useState<'page' | 'direct' | 'webp' | 'html' | 'markdown' | 'bbcode'>('page');
+  const [activeTab, setActiveTab] = useState<'page' | 'short_direct' | 'direct' | 'webp' | 'html' | 'markdown' | 'bbcode'>('short_direct');
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [qrModalUrl, setQrModalUrl] = useState<{ url: string; title: string } | null>(null);
 
@@ -219,28 +219,33 @@ export const UploadPage: React.FC = () => {
   const copyCode = (text: string, key: string) => {
     navigator.clipboard.writeText(text);
     setCopiedKey(key);
-    showToast('Bağlantı panoya kopyalandı!', 'success');
+    showToast('Link panoya kopyalandı!', 'success');
     setTimeout(() => setCopiedKey(null), 2000);
   };
 
   const getPageUrl = (id: string) => `${window.location.origin}/resim/${id}`;
+  const getShortDirectUrl = (id: string) => `${window.location.origin}/i/${id}`;
 
   const getEmbedCode = (itemResult: ImageItem) => {
     const pageUrl = getPageUrl(itemResult.id);
-    const directUrl = itemResult.webpUrl || itemResult.url;
+    const shortDirectUrl = getShortDirectUrl(itemResult.id);
+    const cdnDirectUrl = itemResult.url;
+
     switch (activeTab) {
+      case 'short_direct':
+        return shortDirectUrl;
       case 'page':
         return pageUrl;
       case 'direct':
-        return itemResult.url;
+        return cdnDirectUrl;
       case 'webp':
-        return itemResult.webpUrl || itemResult.url;
+        return itemResult.webpUrl || shortDirectUrl;
       case 'html':
-        return `<a href="${pageUrl}" target="_blank"><img src="${directUrl}" alt="${itemResult.fileName}" /></a>`;
+        return `<a href="${pageUrl}" target="_blank"><img src="${shortDirectUrl}" alt="${itemResult.fileName}" /></a>`;
       case 'markdown':
-        return `[![${itemResult.fileName}](${directUrl})](${pageUrl})`;
+        return `[![${itemResult.fileName}](${shortDirectUrl})](${pageUrl})`;
       case 'bbcode':
-        return `[url=${pageUrl}][img]${directUrl}[/img][/url]`;
+        return `[url=${pageUrl}][img]${shortDirectUrl}[/img][/url]`;
     }
   };
 
@@ -413,23 +418,34 @@ export const UploadPage: React.FC = () => {
                     {/* Embed Tabs */}
                     <div className="flex flex-wrap items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-2">
                       <button
+                        onClick={() => setActiveTab('short_direct')}
+                        className={`text-xs font-bold px-3 py-1 rounded-lg transition-colors flex items-center gap-1 cursor-pointer ${
+                          activeTab === 'short_direct'
+                            ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-xs'
+                            : 'text-indigo-700 dark:text-indigo-300 bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100'
+                        }`}
+                      >
+                        <LinkIcon className="w-3.5 h-3.5" />
+                        🔥 Kısa Direkt Link
+                      </button>
+                      <button
                         onClick={() => setActiveTab('page')}
-                        className={`text-xs font-bold px-3 py-1 rounded-lg transition-colors flex items-center gap-1 ${
+                        className={`text-xs font-semibold px-3 py-1 rounded-lg transition-colors flex items-center gap-1 cursor-pointer ${
                           activeTab === 'page'
-                            ? 'bg-indigo-600 text-white shadow-xs'
+                            ? 'bg-slate-900 dark:bg-slate-700 text-white'
                             : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
                         }`}
                       >
                         <Globe className="w-3.5 h-3.5" />
-                        Site Sayfa Bağlantısı
+                        Resim Sayfası
                       </button>
                       <button
                         onClick={() => setActiveTab('direct')}
-                        className={`text-xs font-semibold px-3 py-1 rounded-lg transition-colors ${
+                        className={`text-xs font-semibold px-3 py-1 rounded-lg transition-colors cursor-pointer ${
                           activeTab === 'direct' ? 'bg-slate-900 dark:bg-slate-700 text-white' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
                         }`}
                       >
-                        Direkt Resim
+                        CDN Ham Link
                       </button>
                       <button
                         onClick={() => setActiveTab('webp')}

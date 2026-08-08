@@ -36,7 +36,7 @@ export const QRModal: React.FC<QRModalProps> = ({ url, title, onClose }) => {
   const copyUrl = () => {
     navigator.clipboard.writeText(url);
     setCopied(true);
-    showToast('Bağlantı kopyalandı!', 'success');
+    showToast('Link panoya kopyalandı!', 'success');
     setTimeout(() => setCopied(false), 2000);
   };
 

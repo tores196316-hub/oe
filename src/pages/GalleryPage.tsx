@@ -62,7 +62,7 @@ export const GalleryPage: React.FC = () => {
     e.stopPropagation();
     navigator.clipboard.writeText(img.url);
     setCopiedId(img.id);
-    showToast('Görsel adresi kopyalandı!', 'success');
+    showToast('Link panoya kopyalandı!', 'success');
     setTimeout(() => setCopiedId(null), 2000);
   };
 

@@ -6,7 +6,6 @@ import { SiteProvider } from './context/SiteContext';
 import { ThemeProvider } from './context/ThemeContext';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
-import { AnnouncementBanner } from './components/AnnouncementBanner';
 import { AnnouncementModal } from './components/AnnouncementModal';
 
 import { HomePage } from './pages/HomePage';
@@ -29,7 +28,6 @@ export default function App() {
           <AuthProvider>
             <SiteProvider>
               <div className="min-h-screen bg-[#fbfbfd] dark:bg-[#0b0c10] text-slate-900 dark:text-slate-100 flex flex-col font-sans antialiased selection:bg-indigo-500 selection:text-white transition-colors duration-300">
-                <AnnouncementBanner />
                 <AnnouncementModal />
                 <Navbar />
                 <main className="flex-1">
