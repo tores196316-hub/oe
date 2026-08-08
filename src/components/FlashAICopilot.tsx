@@ -1,6 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Zap, X, Send, Bot, User, Sparkles, RefreshCw, Copy, Check } from 'lucide-react';
+import { Zap, X, Send, Bot, User, Sparkles, RefreshCw, Copy, Check, HelpCircle } from 'lucide-react';
 import { useToast } from '../context/ToastContext';
 
 interface Message {
@@ -104,16 +104,16 @@ export const FlashAICopilot: React.FC = () => {
         onClick={() => setIsOpen(!isOpen)}
         whileHover={{ scale: 1.05 }}
         whileTap={{ scale: 0.95 }}
-        className="fixed bottom-6 left-6 z-40 flex items-center gap-2 px-4 py-3 bg-gradient-to-r from-amber-500 via-indigo-600 to-purple-600 text-white rounded-full shadow-xl shadow-indigo-500/25 border border-white/20 cursor-pointer hover:brightness-110 transition-all"
-        title="Flash AI Low-Latency Copilot"
+        className="fixed bottom-6 left-6 z-40 flex items-center gap-2.5 px-4 py-3 bg-gradient-to-r from-indigo-600 via-purple-600 to-amber-500 text-white rounded-full shadow-xl shadow-indigo-500/25 border border-white/20 cursor-pointer hover:brightness-110 transition-all"
+        title="Soru Sor - Yapay Zeka Asistanı"
       >
         <div className="relative">
-          <Zap className="w-5 h-5 text-amber-300 animate-pulse" />
+          <HelpCircle className="w-5 h-5 text-amber-300 animate-pulse" />
           <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-emerald-400 ring-2 ring-slate-900" />
         </div>
-        <span className="text-xs font-black tracking-wide hidden sm:inline">Flash AI</span>
-        <span className="px-1.5 py-0.5 rounded-md bg-white/20 text-[10px] font-mono font-bold uppercase backdrop-blur-xs">
-          gemini-3.1-flash-lite
+        <span className="text-xs font-black tracking-wide">Soru Sor</span>
+        <span className="px-2 py-0.5 rounded-full bg-white/20 text-[10px] font-bold uppercase backdrop-blur-xs">
+          AI Asistan
         </span>
       </motion.button>
 
