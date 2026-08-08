@@ -51,23 +51,23 @@ export const QRModal: React.FC<QRModalProps> = ({ url, title, onClose }) => {
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-white rounded-3xl p-6 max-w-sm w-full shadow-2xl border border-slate-100 flex flex-col items-center relative">
+      <div className="bg-white dark:bg-[#0f1017] rounded-3xl p-6 max-w-sm w-full shadow-2xl border border-slate-100 dark:border-slate-800 flex flex-col items-center relative">
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-slate-400 hover:text-slate-600 p-1 rounded-full hover:bg-slate-100 transition-colors"
+          className="absolute top-4 right-4 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 p-1 rounded-full hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
         >
           <X className="w-5 h-5" />
         </button>
 
-        <h3 className="font-bold text-lg text-slate-900 text-center mb-1">QR Kod İle Paylaş</h3>
-        <p className="text-xs text-slate-500 text-center mb-4 max-w-[240px] truncate">{title}</p>
+        <h3 className="font-bold text-lg text-slate-900 dark:text-white text-center mb-1">QR Kod İle Paylaş</h3>
+        <p className="text-xs text-slate-500 dark:text-slate-400 text-center mb-4 max-w-[240px] truncate">{title}</p>
 
         {qrDataUrl ? (
           <div className="p-3 bg-white rounded-2xl border border-slate-200 shadow-inner mb-4">
             <img src={qrDataUrl} alt="QR Code" className="w-52 h-52 object-contain" />
           </div>
         ) : (
-          <div className="w-52 h-52 bg-slate-100 rounded-2xl animate-pulse flex items-center justify-center mb-4 text-xs text-slate-400">
+          <div className="w-52 h-52 bg-slate-100 dark:bg-slate-800 rounded-2xl animate-pulse flex items-center justify-center mb-4 text-xs text-slate-400">
             QR Oluşturuluyor...
           </div>
         )}
@@ -75,17 +75,17 @@ export const QRModal: React.FC<QRModalProps> = ({ url, title, onClose }) => {
         <div className="flex items-center gap-2 w-full">
           <button
             onClick={copyUrl}
-            className="flex-1 flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold transition-colors"
+            className="flex-1 flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-semibold transition-colors"
           >
-            {copied ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4 text-slate-600" />}
+            {copied ? <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400" /> : <Copy className="w-4 h-4 text-slate-600 dark:text-slate-400" />}
             {copied ? 'Kopyalandı' : 'Linki Kopyala'}
           </button>
 
           <button
             onClick={downloadQR}
-            className="flex-1 flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white text-xs font-semibold shadow-sm transition-colors"
+            className="flex-1 flex items-center justify-center gap-1.5 py-2.5 px-3 rounded-xl bg-slate-900 dark:bg-indigo-600 hover:bg-slate-800 dark:hover:bg-indigo-500 text-white text-xs font-semibold shadow-sm transition-colors"
           >
-            <Download className="w-4 h-4 text-indigo-400" />
+            <Download className="w-4 h-4 text-indigo-400 dark:text-indigo-200" />
             QR'ı İndir
           </button>
         </div>

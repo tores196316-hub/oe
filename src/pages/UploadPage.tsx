@@ -245,45 +245,45 @@ export const UploadPage: React.FC = () => {
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10 py-6">
       {/* Title Header */}
       <div className="text-center space-y-2">
-        <span className="px-3 py-1 rounded-full bg-slate-900/5 border border-slate-900/10 text-xs font-semibold text-slate-800 inline-flex items-center gap-1.5">
-          <Sparkles className="w-3.5 h-3.5 text-indigo-600" /> Hızlı Yükleme Stüdyosu
+        <span className="px-3 py-1 rounded-full bg-slate-900/5 dark:bg-slate-800 border border-slate-900/10 dark:border-slate-700 text-xs font-semibold text-slate-800 dark:text-slate-200 inline-flex items-center gap-1.5">
+          <Sparkles className="w-3.5 h-3.5 text-indigo-600 dark:text-indigo-400" /> Hızlı Yükleme Stüdyosu
         </span>
-        <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight">
+        <h1 className="text-3xl sm:text-4xl font-extrabold text-slate-900 dark:text-white tracking-tight">
           Resmini Yükle ve Paylaş
         </h1>
-        <p className="text-sm text-slate-500 max-w-lg mx-auto">
+        <p className="text-sm text-slate-500 dark:text-slate-400 max-w-lg mx-auto">
           Dosyalarınızı buraya sürükleyin, bilgisayarınızdan seçin veya doğrudan panodan yapıştırın (Ctrl + V).
         </p>
       </div>
 
       {/* Settings & Limits Bar */}
-      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 p-4 rounded-2xl bg-white dark:bg-[#12131b] border border-slate-200/80 dark:border-slate-800 shadow-xs">
         <div className="flex flex-wrap items-center gap-2">
-          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-100">
-            <Lock className="w-4 h-4 text-indigo-600 shrink-0" />
+          <div className="flex items-center gap-2 px-3 py-1.5 rounded-xl text-xs font-semibold bg-indigo-50 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300 border border-indigo-100 dark:border-indigo-900/80">
+            <Lock className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
             <span>Kişisel & Güvenli Yükleme</span>
           </div>
 
           {!userProfile ? (
-            <div className="flex items-center gap-2 bg-amber-50 text-amber-800 border border-amber-200/80 px-3 py-1.5 rounded-xl text-xs font-semibold">
+            <div className="flex items-center gap-2 bg-amber-50 dark:bg-amber-950/40 text-amber-800 dark:text-amber-300 border border-amber-200/80 dark:border-amber-800/80 px-3 py-1.5 rounded-xl text-xs font-semibold">
               <span>Ziyaretçi Limiti: <strong>Aynı anda 5 Resim</strong></span>
               <Link
                 to="/auth?tab=register"
-                className="ml-1 text-indigo-600 font-bold hover:underline flex items-center gap-1 bg-white px-2 py-0.5 rounded-md border border-indigo-100 shadow-2xs"
+                className="ml-1 text-indigo-600 dark:text-indigo-400 font-bold hover:underline flex items-center gap-1 bg-white dark:bg-slate-800 px-2 py-0.5 rounded-md border border-indigo-100 dark:border-slate-700 shadow-2xs"
               >
                 <UserPlus className="w-3 h-3" /> 15 Resim İçin Kaydol
               </Link>
             </div>
           ) : (
-            <div className="flex items-center gap-1.5 bg-emerald-50 text-emerald-800 border border-emerald-200/80 px-3 py-1.5 rounded-xl text-xs font-bold">
-              <UserCheck className="w-3.5 h-3.5 text-emerald-600" />
+            <div className="flex items-center gap-1.5 bg-emerald-50 dark:bg-emerald-950/40 text-emerald-800 dark:text-emerald-300 border border-emerald-200/80 dark:border-emerald-800/80 px-3 py-1.5 rounded-xl text-xs font-bold">
+              <UserCheck className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
               <span>Üye Limiti: <strong>Aynı anda 15 Resim Aktif</strong></span>
             </div>
           )}
         </div>
 
-        <span className="text-xs text-slate-500">
-          Formatlar: <strong className="text-slate-800">PNG, JPG, WEBP, GIF, AVIF</strong> (Maks 25 MB)
+        <span className="text-xs text-slate-500 dark:text-slate-400">
+          Formatlar: <strong className="text-slate-800 dark:text-slate-200">PNG, JPG, WEBP, GIF, AVIF</strong> (Maks 25 MB)
         </span>
       </div>
 
@@ -298,8 +298,8 @@ export const UploadPage: React.FC = () => {
         onClick={() => fileInputRef.current?.click()}
         className={`relative border-2 border-dashed rounded-3xl p-10 sm:p-14 text-center cursor-pointer transition-all ${
           isDragOver
-            ? 'border-indigo-500 bg-indigo-50/50 scale-[1.01]'
-            : 'border-slate-300 bg-white hover:border-slate-400 hover:bg-slate-50/50'
+            ? 'border-indigo-500 bg-indigo-50/50 dark:bg-indigo-950/30 scale-[1.01]'
+            : 'border-slate-300 dark:border-slate-700 bg-white dark:bg-[#12131b] hover:border-slate-400 dark:hover:border-slate-600 hover:bg-slate-50/50 dark:hover:bg-slate-800/40'
         }`}
       >
         <input
@@ -312,18 +312,18 @@ export const UploadPage: React.FC = () => {
         />
 
         <div className="flex flex-col items-center justify-center space-y-4">
-          <div className="w-16 h-16 rounded-3xl bg-slate-100 border border-slate-200/80 flex items-center justify-center text-slate-700 shadow-xs">
-            <Upload className="w-8 h-8 text-indigo-600" />
+          <div className="w-16 h-16 rounded-3xl bg-slate-100 dark:bg-slate-800 border border-slate-200/80 dark:border-slate-700 flex items-center justify-center text-slate-700 dark:text-slate-200 shadow-xs">
+            <Upload className="w-8 h-8 text-indigo-600 dark:text-indigo-400" />
           </div>
 
           <div>
-            <p className="text-lg font-bold text-slate-900">
-              Resimleri Buraya Sürükleyin veya <span className="text-indigo-600 underline">Göz Atın</span>
+            <p className="text-lg font-bold text-slate-900 dark:text-white">
+              Resimleri Buraya Sürükleyin veya <span className="text-indigo-600 dark:text-indigo-400 underline">Göz Atın</span>
             </p>
-            <p className="text-xs text-slate-400 mt-1">
-              Veya ekran görüntüsünü doğrudan buraya yapıştırın <kbd className="px-1.5 py-0.5 rounded bg-slate-100 border border-slate-300 font-mono text-[10px]">Ctrl+V</kbd>
+            <p className="text-xs text-slate-400 dark:text-slate-500 mt-1">
+              Veya ekran görüntüsünü doğrudan buraya yapıştırın <kbd className="px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 border border-slate-300 dark:border-slate-700 font-mono text-[10px] text-slate-700 dark:text-slate-300">Ctrl+V</kbd>
             </p>
-            <p className="text-xs text-indigo-600 font-semibold mt-2">
+            <p className="text-xs text-indigo-600 dark:text-indigo-400 font-semibold mt-2">
               {!userProfile
                 ? '⚡ Misafir olarak aynı anda 5 resim yükleyebilirsiniz.'
                 : '⚡ Üye olarak aynı anda 15 resim birden yükleyebilirsiniz.'}
@@ -335,25 +335,25 @@ export const UploadPage: React.FC = () => {
       {/* Upload Queue List */}
       {queue.length > 0 && (
         <div className="space-y-6">
-          <h2 className="text-xl font-bold text-slate-900">Yüklenen Resimler ({queue.length})</h2>
+          <h2 className="text-xl font-bold text-slate-900 dark:text-white">Yüklenen Resimler ({queue.length})</h2>
 
           <div className="space-y-4">
             {queue.map((item) => (
               <div
                 key={item.id}
-                className="p-5 rounded-2xl bg-white border border-slate-200/80 shadow-xs space-y-4"
+                className="p-5 rounded-2xl bg-white dark:bg-[#12131b] border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-4"
               >
                 <div className="flex items-center gap-4">
                   <img
                     src={item.previewUrl}
                     alt={item.file.name}
-                    className="w-16 h-16 object-cover rounded-xl border border-slate-200"
+                    className="w-16 h-16 object-cover rounded-xl border border-slate-200 dark:border-slate-700"
                   />
 
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center justify-between">
-                      <p className="text-sm font-bold text-slate-900 truncate">{item.file.name}</p>
-                      <span className="text-xs font-semibold text-slate-500">
+                      <p className="text-sm font-bold text-slate-900 dark:text-white truncate">{item.file.name}</p>
+                      <span className="text-xs font-semibold text-slate-500 dark:text-slate-400">
                         {(item.file.size / (1024 * 1024)).toFixed(2)} MB
                       </span>
                     </div>
@@ -361,31 +361,31 @@ export const UploadPage: React.FC = () => {
                     {/* Status Badge & Progress */}
                     <div className="mt-2 flex items-center justify-between text-xs">
                       {item.status === 'uploading' && (
-                        <span className="text-indigo-600 font-medium flex items-center gap-1">
+                        <span className="text-indigo-600 dark:text-indigo-400 font-medium flex items-center gap-1">
                           <RefreshCw className="w-3.5 h-3.5 animate-spin" /> Yükleniyor... %{item.progress}
                         </span>
                       )}
                       {item.status === 'completed' && (
-                        <span className="text-emerald-600 font-semibold flex items-center gap-1">
-                          <CheckCircle2 className="w-4 h-4 text-emerald-500" /> Tamamlandı
+                        <span className="text-emerald-600 dark:text-emerald-400 font-semibold flex items-center gap-1">
+                          <CheckCircle2 className="w-4 h-4 text-emerald-500 dark:text-emerald-400" /> Tamamlandı
                         </span>
                       )}
                       {item.status === 'error' && (
-                        <span className="text-rose-600 font-semibold">{item.errorMessage || 'Hata'}</span>
+                        <span className="text-rose-600 dark:text-rose-400 font-semibold">{item.errorMessage || 'Hata'}</span>
                       )}
 
                       <div className="flex items-center gap-2">
                         {item.status === 'error' && (
                           <button
                             onClick={() => retryQueueItem(item)}
-                            className="text-xs text-indigo-600 font-semibold hover:underline"
+                            className="text-xs text-indigo-600 dark:text-indigo-400 font-semibold hover:underline"
                           >
                             Tekrar Dene
                           </button>
                         )}
                         <button
                           onClick={() => removeQueueItem(item.id)}
-                          className="text-slate-400 hover:text-slate-600 p-1"
+                          className="text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 p-1"
                         >
                           <X className="w-4 h-4" />
                         </button>
@@ -394,9 +394,9 @@ export const UploadPage: React.FC = () => {
 
                     {/* Progress Bar */}
                     {item.status === 'uploading' && (
-                      <div className="w-full bg-slate-100 rounded-full h-1.5 mt-2 overflow-hidden">
+                      <div className="w-full bg-slate-100 dark:bg-slate-800 rounded-full h-1.5 mt-2 overflow-hidden">
                         <div
-                          className="bg-indigo-600 h-1.5 rounded-full transition-all duration-300"
+                          className="bg-indigo-600 dark:bg-indigo-500 h-1.5 rounded-full transition-all duration-300"
                           style={{ width: `${item.progress}%` }}
                         />
                       </div>
@@ -406,15 +406,15 @@ export const UploadPage: React.FC = () => {
 
                 {/* Successful Result Code Embeds */}
                 {item.status === 'completed' && item.result && (
-                  <div className="pt-4 border-t border-slate-100 space-y-3">
+                  <div className="pt-4 border-t border-slate-100 dark:border-slate-800 space-y-3">
                     {/* Embed Tabs */}
-                    <div className="flex flex-wrap items-center gap-2 border-b border-slate-100 pb-2">
+                    <div className="flex flex-wrap items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-2">
                       <button
                         onClick={() => setActiveTab('page')}
                         className={`text-xs font-bold px-3 py-1 rounded-lg transition-colors flex items-center gap-1 ${
                           activeTab === 'page'
                             ? 'bg-indigo-600 text-white shadow-xs'
-                            : 'text-slate-600 hover:bg-slate-100'
+                            : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
                         }`}
                       >
                         <Globe className="w-3.5 h-3.5" />
@@ -423,7 +423,7 @@ export const UploadPage: React.FC = () => {
                       <button
                         onClick={() => setActiveTab('direct')}
                         className={`text-xs font-semibold px-3 py-1 rounded-lg transition-colors ${
-                          activeTab === 'direct' ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100'
+                          activeTab === 'direct' ? 'bg-slate-900 dark:bg-slate-700 text-white' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
                         }`}
                       >
                         Direkt Resim
@@ -431,7 +431,7 @@ export const UploadPage: React.FC = () => {
                       <button
                         onClick={() => setActiveTab('html')}
                         className={`text-xs font-semibold px-3 py-1 rounded-lg transition-colors ${
-                          activeTab === 'html' ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100'
+                          activeTab === 'html' ? 'bg-slate-900 dark:bg-slate-700 text-white' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
                         }`}
                       >
                         HTML Kodu
@@ -439,7 +439,7 @@ export const UploadPage: React.FC = () => {
                       <button
                         onClick={() => setActiveTab('markdown')}
                         className={`text-xs font-semibold px-3 py-1 rounded-lg transition-colors ${
-                          activeTab === 'markdown' ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100'
+                          activeTab === 'markdown' ? 'bg-slate-900 dark:bg-slate-700 text-white' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
                         }`}
                       >
                         Markdown
@@ -447,7 +447,7 @@ export const UploadPage: React.FC = () => {
                       <button
                         onClick={() => setActiveTab('bbcode')}
                         className={`text-xs font-semibold px-3 py-1 rounded-lg transition-colors ${
-                          activeTab === 'bbcode' ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100'
+                          activeTab === 'bbcode' ? 'bg-slate-900 dark:bg-slate-700 text-white' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
                         }`}
                       >
                         BBCode
@@ -455,7 +455,7 @@ export const UploadPage: React.FC = () => {
                     </div>
 
                     {/* Code Display Box */}
-                    <div className="flex items-center gap-2 bg-slate-900 text-slate-100 p-3 rounded-xl font-mono text-xs overflow-x-auto">
+                    <div className="flex items-center gap-2 bg-slate-900 dark:bg-slate-950 text-slate-100 p-3 rounded-xl font-mono text-xs overflow-x-auto border dark:border-slate-800">
                       <span className="flex-1 truncate select-all">
                         {getEmbedCode(item.result)}
                       </span>
@@ -486,16 +486,16 @@ export const UploadPage: React.FC = () => {
                             title: item.result!.fileName,
                           })
                         }
-                        className="flex items-center gap-1.5 text-slate-600 hover:text-slate-900 font-semibold"
+                        className="flex items-center gap-1.5 text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white font-semibold"
                       >
-                        <QrCode className="w-4 h-4 text-indigo-600" /> Sayfa QR Kodunu Üret
+                        <QrCode className="w-4 h-4 text-indigo-600 dark:text-indigo-400" /> Sayfa QR Kodunu Üret
                       </button>
 
                       <a
                         href={getPageUrl(item.result.id)}
                         target="_blank"
                         rel="noreferrer"
-                        className="flex items-center gap-1.5 text-indigo-600 font-bold hover:underline bg-indigo-50 border border-indigo-100 px-3 py-1 rounded-lg"
+                        className="flex items-center gap-1.5 text-indigo-600 dark:text-indigo-400 font-bold hover:underline bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-100 dark:border-indigo-900/60 px-3 py-1 rounded-lg"
                       >
                         Sitedeki Resim Sayfasına Git <ExternalLink className="w-3.5 h-3.5" />
                       </a>

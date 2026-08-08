@@ -108,7 +108,7 @@ export const AnnouncementModal: React.FC = () => {
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 12 }}
           transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-          className="relative w-full max-w-lg bg-white rounded-3xl shadow-2xl overflow-hidden border border-slate-100"
+          className="relative w-full max-w-lg bg-white dark:bg-[#0f1017] rounded-3xl shadow-2xl overflow-hidden border border-slate-100 dark:border-slate-800"
         >
           {/* Header */}
           <div className={`p-6 text-white ${theme.headerBg} relative`}>
@@ -147,15 +147,15 @@ export const AnnouncementModal: React.FC = () => {
 
           {/* Body */}
           <div className="p-6 space-y-5">
-            <p className="text-slate-700 text-sm leading-relaxed whitespace-pre-line">
+            <p className="text-slate-700 dark:text-slate-200 text-sm leading-relaxed whitespace-pre-line">
               {activeModalAnn.message}
             </p>
 
-            <div className="pt-2 flex flex-col sm:flex-row items-center justify-end gap-3 border-t border-slate-100">
+            <div className="pt-2 flex flex-col sm:flex-row items-center justify-end gap-3 border-t border-slate-100 dark:border-slate-800">
               <button
                 type="button"
                 onClick={handleClose}
-                className="w-full sm:w-auto px-5 py-2.5 rounded-xl border border-slate-200 text-slate-700 font-semibold text-xs hover:bg-slate-50 transition-colors cursor-pointer text-center"
+                className="w-full sm:w-auto px-5 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-300 font-semibold text-xs hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer text-center"
               >
                 Anladım, Kapat
               </button>

@@ -128,13 +128,13 @@ export const ImageDetailPage: React.FC = () => {
 
   if (error || !image) {
     return (
-      <div className="max-w-xl mx-auto px-4 py-16 text-center space-y-4 bg-white rounded-3xl border border-slate-200 shadow-xs">
+      <div className="max-w-xl mx-auto px-4 py-16 text-center space-y-4 bg-white dark:bg-[#12131b] rounded-3xl border border-slate-200 dark:border-slate-800 shadow-xs">
         <ShieldAlert className="w-12 h-12 text-rose-500 mx-auto" />
-        <h2 className="text-xl font-bold text-slate-900">Görsel Bulunamadı</h2>
-        <p className="text-xs text-slate-500">Aradığınız resim kaldırılmış veya geçersiz bir bağlantı kullanıyor olabilirsiniz.</p>
+        <h2 className="text-xl font-bold text-slate-900 dark:text-white">Görsel Bulunamadı</h2>
+        <p className="text-xs text-slate-500 dark:text-slate-400">Aradığınız resim kaldırılmış veya geçersiz bir bağlantı kullanıyor olabilirsiniz.</p>
         <Link
           to="/galeri"
-          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900 text-white font-semibold text-xs"
+          className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-slate-900 dark:bg-indigo-600 text-white font-semibold text-xs"
         >
           <ArrowLeft className="w-4 h-4" /> Galeriye Dön
         </Link>
@@ -165,7 +165,7 @@ export const ImageDetailPage: React.FC = () => {
       {/* Top back button */}
       <Link
         to="/galeri"
-        className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-600 hover:text-slate-900 bg-white border border-slate-200 px-3 py-1.5 rounded-xl shadow-xs transition-colors"
+        className="inline-flex items-center gap-1.5 text-xs font-bold text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white bg-white dark:bg-[#12131b] border border-slate-200 dark:border-slate-800 px-3 py-1.5 rounded-xl shadow-xs transition-colors"
       >
         <ArrowLeft className="w-4 h-4" /> Galeriye Dön
       </Link>
@@ -173,7 +173,7 @@ export const ImageDetailPage: React.FC = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Main Image View Box */}
         <div className="lg:col-span-2 space-y-4">
-          <div className="relative rounded-3xl bg-slate-900 overflow-hidden shadow-xl flex items-center justify-center p-4 min-h-[400px]">
+          <div className="relative rounded-3xl bg-slate-900 dark:bg-[#0c0d13] overflow-hidden shadow-xl flex items-center justify-center p-4 min-h-[400px] border dark:border-slate-800">
             <img
               src={image.url}
               alt={image.title || image.fileName}
@@ -192,41 +192,41 @@ export const ImageDetailPage: React.FC = () => {
           </div>
 
           {/* Quick Action Buttons */}
-          <div className="p-4 rounded-2xl bg-white border border-slate-200/80 shadow-xs flex flex-wrap items-center justify-between gap-3">
+          <div className="p-4 rounded-2xl bg-white dark:bg-[#12131b] border border-slate-200/80 dark:border-slate-800 shadow-xs flex flex-wrap items-center justify-between gap-3">
             <div className="flex flex-wrap items-center gap-2">
               <button
                 onClick={handleDownload}
-                className="px-4 py-2.5 rounded-xl bg-slate-900 text-white text-xs font-semibold hover:bg-slate-800 transition-colors flex items-center gap-1.5 shadow-xs"
+                className="px-4 py-2.5 rounded-xl bg-slate-900 dark:bg-indigo-600 text-white text-xs font-semibold hover:bg-slate-800 dark:hover:bg-indigo-500 transition-colors flex items-center gap-1.5 shadow-xs"
               >
-                <Download className="w-4 h-4 text-indigo-400" />
+                <Download className="w-4 h-4 text-indigo-400 dark:text-indigo-200" />
                 İndir
               </button>
 
               <button
                 onClick={() => copyCode(sitePageUrl, 'direct_btn')}
-                className="px-3.5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold transition-colors flex items-center gap-1.5"
+                className="px-3.5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-semibold transition-colors flex items-center gap-1.5"
               >
                 {copiedKey === 'direct_btn' ? (
-                  <Check className="w-4 h-4 text-emerald-600" />
+                  <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                 ) : (
-                  <Copy className="w-4 h-4 text-slate-600" />
+                  <Copy className="w-4 h-4 text-slate-600 dark:text-slate-400" />
                 )}
                 Linki Kopyala
               </button>
 
               <button
                 onClick={handleShare}
-                className="px-3.5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold transition-colors flex items-center gap-1.5"
+                className="px-3.5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-semibold transition-colors flex items-center gap-1.5"
               >
-                <Share2 className="w-4 h-4 text-slate-600" />
+                <Share2 className="w-4 h-4 text-slate-600 dark:text-slate-400" />
                 Paylaş
               </button>
 
               <button
                 onClick={() => setQrModalOpen(true)}
-                className="px-3.5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold transition-colors flex items-center gap-1.5"
+                className="px-3.5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-semibold transition-colors flex items-center gap-1.5"
               >
-                <QrCode className="w-4 h-4 text-indigo-600" />
+                <QrCode className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
                 QR Kod
               </button>
 
@@ -234,9 +234,9 @@ export const ImageDetailPage: React.FC = () => {
                 href={image.url}
                 target="_blank"
                 rel="noreferrer"
-                className="px-3.5 py-2.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold transition-colors flex items-center gap-1.5"
+                className="px-3.5 py-2.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-semibold transition-colors flex items-center gap-1.5"
               >
-                <ExternalLink className="w-4 h-4 text-slate-600" />
+                <ExternalLink className="w-4 h-4 text-slate-600 dark:text-slate-400" />
                 Yeni Sekmede Aç
               </a>
             </div>
@@ -244,24 +244,24 @@ export const ImageDetailPage: React.FC = () => {
             {userProfile?.role === 'admin' && (
               <button
                 onClick={() => setDeleteModalOpen(true)}
-                className="px-3.5 py-2.5 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 text-xs font-semibold transition-colors flex items-center gap-1.5"
+                className="px-3.5 py-2.5 rounded-xl bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-100 dark:hover:bg-rose-900/60 text-rose-700 dark:text-rose-300 text-xs font-semibold transition-colors flex items-center gap-1.5"
                 title="Sil (Yönetici Yetkisi)"
               >
-                <Trash2 className="w-4 h-4 text-rose-600" />
+                <Trash2 className="w-4 h-4 text-rose-600 dark:text-rose-400" />
                 Sil
               </button>
             )}
           </div>
 
           {/* Embed Code Tabs */}
-          <div className="p-6 rounded-3xl bg-white border border-slate-200/80 shadow-xs space-y-4">
-            <h3 className="font-bold text-sm text-slate-900 tracking-wide uppercase">Gömme Kodları (Embed)</h3>
+          <div className="p-6 rounded-3xl bg-white dark:bg-[#12131b] border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-4">
+            <h3 className="font-bold text-sm text-slate-900 dark:text-white tracking-wide uppercase">Gömme Kodları (Embed)</h3>
 
-            <div className="flex flex-wrap items-center gap-2 border-b border-slate-100 pb-2">
+            <div className="flex flex-wrap items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-2">
               <button
                 onClick={() => setActiveEmbed('page')}
                 className={`text-xs font-bold px-3 py-1.5 rounded-lg transition-colors flex items-center gap-1 ${
-                  activeEmbed === 'page' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-600 hover:bg-slate-100'
+                  activeEmbed === 'page' ? 'bg-indigo-600 text-white shadow-xs' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
                 }`}
               >
                 Site Sayfa Linki
@@ -269,7 +269,7 @@ export const ImageDetailPage: React.FC = () => {
               <button
                 onClick={() => setActiveEmbed('direct')}
                 className={`text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors ${
-                  activeEmbed === 'direct' ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100'
+                  activeEmbed === 'direct' ? 'bg-slate-900 dark:bg-slate-700 text-white' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
                 }`}
               >
                 Direkt Link
@@ -277,7 +277,7 @@ export const ImageDetailPage: React.FC = () => {
               <button
                 onClick={() => setActiveEmbed('html')}
                 className={`text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors ${
-                  activeEmbed === 'html' ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100'
+                  activeEmbed === 'html' ? 'bg-slate-900 dark:bg-slate-700 text-white' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
                 }`}
               >
                 HTML koda
@@ -285,7 +285,7 @@ export const ImageDetailPage: React.FC = () => {
               <button
                 onClick={() => setActiveEmbed('markdown')}
                 className={`text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors ${
-                  activeEmbed === 'markdown' ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100'
+                  activeEmbed === 'markdown' ? 'bg-slate-900 dark:bg-slate-700 text-white' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
                 }`}
               >
                 Markdown
@@ -293,14 +293,14 @@ export const ImageDetailPage: React.FC = () => {
               <button
                 onClick={() => setActiveEmbed('bbcode')}
                 className={`text-xs font-semibold px-3 py-1.5 rounded-lg transition-colors ${
-                  activeEmbed === 'bbcode' ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100'
+                  activeEmbed === 'bbcode' ? 'bg-slate-900 dark:bg-slate-700 text-white' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
                 }`}
               >
                 BBCode Forum
               </button>
             </div>
 
-            <div className="flex items-center gap-2 bg-slate-900 text-slate-100 p-3.5 rounded-2xl font-mono text-xs overflow-x-auto">
+            <div className="flex items-center gap-2 bg-slate-900 dark:bg-slate-950 text-slate-100 p-3.5 rounded-2xl font-mono text-xs overflow-x-auto border dark:border-slate-800">
               <span className="flex-1 truncate">{getEmbedCode()}</span>
               <button
                 onClick={() => copyCode(getEmbedCode(), 'embed_copy')}
@@ -318,63 +318,63 @@ export const ImageDetailPage: React.FC = () => {
 
         {/* Sidebar Image Details */}
         <div className="space-y-6">
-          <div className="p-6 rounded-3xl bg-white border border-slate-200/80 shadow-xs space-y-6">
+          <div className="p-6 rounded-3xl bg-white dark:bg-[#12131b] border border-slate-200/80 dark:border-slate-800 shadow-xs space-y-6">
             <div>
-              <h2 className="text-xl font-bold text-slate-900">{image.title || image.fileName}</h2>
-              <p className="text-xs text-slate-500 mt-1">Yükleyen: {image.userName || 'Anonim'}</p>
+              <h2 className="text-xl font-bold text-slate-900 dark:text-white">{image.title || image.fileName}</h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400 mt-1">Yükleyen: {image.userName || 'Anonim'}</p>
             </div>
 
-            <div className="space-y-4 pt-4 border-t border-slate-100 text-xs">
+            <div className="space-y-4 pt-4 border-t border-slate-100 dark:border-slate-800 text-xs">
               <div className="flex items-center justify-between">
-                <span className="text-slate-500 flex items-center gap-2">
-                  <HardDrive className="w-4 h-4 text-indigo-600" /> Dosya Boyutu
+                <span className="text-slate-500 dark:text-slate-400 flex items-center gap-2">
+                  <HardDrive className="w-4 h-4 text-indigo-600 dark:text-indigo-400" /> Dosya Boyutu
                 </span>
-                <span className="font-bold text-slate-800">{(image.size / (1024 * 1024)).toFixed(2)} MB</span>
+                <span className="font-bold text-slate-800 dark:text-slate-200">{(image.size / (1024 * 1024)).toFixed(2)} MB</span>
               </div>
 
               <div className="flex items-center justify-between">
-                <span className="text-slate-500 flex items-center gap-2">
-                  <Maximize2 className="w-4 h-4 text-indigo-600" /> Çözünürlük
+                <span className="text-slate-500 dark:text-slate-400 flex items-center gap-2">
+                  <Maximize2 className="w-4 h-4 text-indigo-600 dark:text-indigo-400" /> Çözünürlük
                 </span>
-                <span className="font-bold text-slate-800">
+                <span className="font-bold text-slate-800 dark:text-slate-200">
                   {image.width} x {image.height} px
                 </span>
               </div>
 
               <div className="flex items-center justify-between">
-                <span className="text-slate-500 flex items-center gap-2">
-                  <Info className="w-4 h-4 text-indigo-600" /> Format
+                <span className="text-slate-500 dark:text-slate-400 flex items-center gap-2">
+                  <Info className="w-4 h-4 text-indigo-600 dark:text-indigo-400" /> Format
                 </span>
-                <span className="font-bold uppercase text-slate-800">{image.format}</span>
+                <span className="font-bold uppercase text-slate-800 dark:text-slate-200">{image.format}</span>
               </div>
 
               <div className="flex items-center justify-between">
-                <span className="text-slate-500 flex items-center gap-2">
-                  <Calendar className="w-4 h-4 text-indigo-600" /> Yükleme Tarihi
+                <span className="text-slate-500 dark:text-slate-400 flex items-center gap-2">
+                  <Calendar className="w-4 h-4 text-indigo-600 dark:text-indigo-400" /> Yükleme Tarihi
                 </span>
-                <span className="font-bold text-slate-800">
+                <span className="font-bold text-slate-800 dark:text-slate-200">
                   {new Date(image.createdAt).toLocaleDateString('tr-TR')}
                 </span>
               </div>
 
               <div className="flex items-center justify-between">
-                <span className="text-slate-500 flex items-center gap-2">
-                  <Eye className="w-4 h-4 text-indigo-600" /> Görüntülenme
+                <span className="text-slate-500 dark:text-slate-400 flex items-center gap-2">
+                  <Eye className="w-4 h-4 text-indigo-600 dark:text-indigo-400" /> Görüntülenme
                 </span>
-                <span className="font-bold text-slate-800">{image.views}</span>
+                <span className="font-bold text-slate-800 dark:text-slate-200">{image.views}</span>
               </div>
 
               <div className="flex items-center justify-between">
-                <span className="text-slate-500 flex items-center gap-2">
-                  <Download className="w-4 h-4 text-indigo-600" /> İndirilme
+                <span className="text-slate-500 dark:text-slate-400 flex items-center gap-2">
+                  <Download className="w-4 h-4 text-indigo-600 dark:text-indigo-400" /> İndirilme
                 </span>
-                <span className="font-bold text-slate-800">{image.downloads}</span>
+                <span className="font-bold text-slate-800 dark:text-slate-200">{image.downloads}</span>
               </div>
             </div>
 
             {/* Cloudinary CDN Status Badge */}
-            <div className="p-3.5 rounded-2xl bg-indigo-50/80 border border-indigo-100 text-indigo-900 text-xs flex items-center gap-2">
-              <Sparkles className="w-4 h-4 text-indigo-600 shrink-0" />
+            <div className="p-3.5 rounded-2xl bg-indigo-50/80 dark:bg-indigo-950/60 border border-indigo-100 dark:border-indigo-900/60 text-indigo-900 dark:text-indigo-200 text-xs flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-indigo-600 dark:text-indigo-400 shrink-0" />
               <span>Cloudinary CDN ile otomatik optimize edildi.</span>
             </div>
           </div>

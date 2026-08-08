@@ -71,18 +71,18 @@ export const GalleryPage: React.FC = () => {
       {/* Page Header */}
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-extrabold text-slate-900 tracking-tight">Resim Galerisi</h1>
-          <p className="text-sm text-slate-500">
+          <h1 className="text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">Resim Galerisi</h1>
+          <p className="text-sm text-slate-500 dark:text-slate-400">
             Topluluk tarafından paylaşılan ve aranan herkese açık tüm görseller.
           </p>
         </div>
 
         {/* View Mode Toggle */}
-        <div className="flex items-center gap-1.5 p-1 bg-white border border-slate-200 rounded-xl shadow-xs self-start">
+        <div className="flex items-center gap-1.5 p-1 bg-white dark:bg-[#12131b] border border-slate-200 dark:border-slate-800 rounded-xl shadow-xs self-start">
           <button
             onClick={() => setViewMode('grid')}
             className={`p-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors ${
-              viewMode === 'grid' ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100'
+              viewMode === 'grid' ? 'bg-slate-900 dark:bg-slate-700 text-white' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
             }`}
           >
             <Grid className="w-4 h-4" /> Grid
@@ -90,7 +90,7 @@ export const GalleryPage: React.FC = () => {
           <button
             onClick={() => setViewMode('list')}
             className={`p-2 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-colors ${
-              viewMode === 'list' ? 'bg-slate-900 text-white' : 'text-slate-600 hover:bg-slate-100'
+              viewMode === 'list' ? 'bg-slate-900 dark:bg-slate-700 text-white' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800'
             }`}
           >
             <ListIcon className="w-4 h-4" /> Liste
@@ -99,26 +99,26 @@ export const GalleryPage: React.FC = () => {
       </div>
 
       {/* Filter and Search Bar */}
-      <div className="p-4 rounded-3xl bg-white border border-slate-200/80 shadow-xs flex flex-col md:flex-row items-center gap-4">
+      <div className="p-4 rounded-3xl bg-white dark:bg-[#12131b] border border-slate-200/80 dark:border-slate-800 shadow-xs flex flex-col md:flex-row items-center gap-4">
         {/* Search Input */}
         <form onSubmit={handleSearchSubmit} className="relative flex-1 w-full">
-          <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
+          <Search className="w-4 h-4 text-slate-400 dark:text-slate-500 absolute left-3.5 top-1/2 -translate-y-1/2" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Resim adı, etiket veya format ara..."
-            className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-sm text-slate-900 focus:outline-none focus:ring-2 focus:ring-slate-900/10 focus:bg-white transition-all"
+            className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-sm text-slate-900 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:bg-white dark:focus:bg-slate-800 transition-all"
           />
         </form>
 
         {/* Format Select */}
         <div className="flex items-center gap-2 w-full md:w-auto">
-          <SlidersHorizontal className="w-4 h-4 text-slate-400 hidden sm:block" />
+          <SlidersHorizontal className="w-4 h-4 text-slate-400 dark:text-slate-500 hidden sm:block" />
           <select
             value={selectedFormat}
             onChange={(e) => setSelectedFormat(e.target.value)}
-            className="px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-800 focus:outline-none"
+            className="px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-800 dark:text-slate-200 focus:outline-none"
           >
             <option value="all">Tüm Formatlar</option>
             <option value="png">PNG</option>
@@ -132,7 +132,7 @@ export const GalleryPage: React.FC = () => {
           <select
             value={selectedSort}
             onChange={(e) => setSelectedSort(e.target.value)}
-            className="px-3.5 py-2.5 rounded-2xl bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-800 focus:outline-none"
+            className="px-3.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700 text-xs font-semibold text-slate-800 dark:text-slate-200 focus:outline-none"
           >
             <option value="newest">En Yeniler</option>
             <option value="oldest">En Eskiler</option>
@@ -146,17 +146,17 @@ export const GalleryPage: React.FC = () => {
       {loading ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
           {[1, 2, 3, 4, 5, 6].map((n) => (
-            <div key={n} className="h-64 rounded-3xl bg-slate-200/60 animate-pulse" />
+            <div key={n} className="h-64 rounded-3xl bg-slate-200/60 dark:bg-slate-800/60 animate-pulse" />
           ))}
         </div>
       ) : images.length === 0 ? (
-        <div className="text-center py-16 bg-white rounded-3xl border border-slate-200/80 p-8 space-y-3">
-          <ImageIcon className="w-12 h-12 text-slate-300 mx-auto" />
-          <h3 className="text-lg font-bold text-slate-800">Hiç resim bulunamadı</h3>
-          <p className="text-xs text-slate-500">Filtrelerinizi değiştirmeyi veya yeni bir resim yüklemeyi deneyin.</p>
+        <div className="text-center py-16 bg-white dark:bg-[#12131b] rounded-3xl border border-slate-200/80 dark:border-slate-800 p-8 space-y-3">
+          <ImageIcon className="w-12 h-12 text-slate-300 dark:text-slate-600 mx-auto" />
+          <h3 className="text-lg font-bold text-slate-800 dark:text-white">Hiç resim bulunamadı</h3>
+          <p className="text-xs text-slate-500 dark:text-slate-400">Filtrelerinizi değiştirmeyi veya yeni bir resim yüklemeyi deneyin.</p>
           <Link
             to="/upload"
-            className="inline-block mt-2 px-4 py-2 rounded-xl bg-slate-900 text-white font-semibold text-xs shadow-sm"
+            className="inline-block mt-2 px-4 py-2 rounded-xl bg-slate-900 dark:bg-indigo-600 text-white font-semibold text-xs shadow-sm"
           >
             Resim Yükle
           </Link>
@@ -166,9 +166,9 @@ export const GalleryPage: React.FC = () => {
           {images.map((img) => (
             <div
               key={img.id}
-              className="group relative rounded-2xl bg-white border border-slate-200/90 shadow-xs overflow-hidden flex flex-col hover:shadow-lg transition-all"
+              className="group relative rounded-2xl bg-white dark:bg-[#12131b] border border-slate-200/90 dark:border-slate-800 shadow-xs overflow-hidden flex flex-col hover:shadow-lg dark:hover:border-slate-700 transition-all"
             >
-              <div className="relative aspect-video bg-slate-100 overflow-hidden">
+              <div className="relative aspect-video bg-slate-100 dark:bg-slate-900 overflow-hidden">
                 <img
                   src={img.thumbnailUrl || img.url}
                   alt={img.title || img.fileName}
@@ -182,15 +182,15 @@ export const GalleryPage: React.FC = () => {
 
               <div className="p-4 flex flex-col justify-between flex-1 space-y-3">
                 <div>
-                  <h3 className="font-semibold text-sm text-slate-900 truncate">
+                  <h3 className="font-semibold text-sm text-slate-900 dark:text-white truncate">
                     {img.title || img.fileName}
                   </h3>
-                  <p className="text-xs text-slate-500 mt-0.5">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
                     {(img.size / 1024).toFixed(0)} KB • {img.width}x{img.height} px
                   </p>
                 </div>
 
-                <div className="flex items-center justify-between pt-2 border-t border-slate-100 text-xs text-slate-500">
+                <div className="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800 text-xs text-slate-500 dark:text-slate-400">
                   <div className="flex items-center gap-3">
                     <span className="flex items-center gap-1">
                       <Eye className="w-3.5 h-3.5" /> {img.views}
@@ -204,10 +204,10 @@ export const GalleryPage: React.FC = () => {
                     <button
                       onClick={(e) => copyImageLink(img, e)}
                       title="Bağlantıyı Kopyala"
-                      className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+                      className="p-1.5 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                     >
                       {copiedId === img.id ? (
-                        <Check className="w-4 h-4 text-emerald-600" />
+                        <Check className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                       ) : (
                         <Copy className="w-4 h-4" />
                       )}
@@ -216,14 +216,14 @@ export const GalleryPage: React.FC = () => {
                     <button
                       onClick={() => setQrModalUrl({ url: img.url, title: img.title || img.fileName })}
                       title="QR Kod Oluştur"
-                      className="p-1.5 rounded-lg text-slate-500 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+                      className="p-1.5 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
                     >
                       <QrCode className="w-4 h-4" />
                     </button>
 
                     <Link
                       to={`/resim/${img.id}`}
-                      className="px-2.5 py-1 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-800 text-xs font-semibold transition-colors"
+                      className="px-2.5 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-semibold transition-colors"
                     >
                       İncele
                     </Link>
@@ -235,18 +235,18 @@ export const GalleryPage: React.FC = () => {
         </div>
       ) : (
         /* List View */
-        <div className="bg-white rounded-3xl border border-slate-200/80 shadow-xs divide-y divide-slate-100 overflow-hidden">
+        <div className="bg-white dark:bg-[#12131b] rounded-3xl border border-slate-200/80 dark:border-slate-800 shadow-xs divide-y divide-slate-100 dark:divide-slate-800 overflow-hidden">
           {images.map((img) => (
-            <div key={img.id} className="p-4 flex items-center justify-between gap-4 hover:bg-slate-50/50 transition-colors">
+            <div key={img.id} className="p-4 flex items-center justify-between gap-4 hover:bg-slate-50/50 dark:hover:bg-slate-800/40 transition-colors">
               <div className="flex items-center gap-4 min-w-0">
                 <img
                   src={img.thumbnailUrl || img.url}
                   alt={img.fileName}
-                  className="w-14 h-14 object-cover rounded-xl border border-slate-200 shrink-0"
+                  className="w-14 h-14 object-cover rounded-xl border border-slate-200 dark:border-slate-700 shrink-0"
                 />
                 <div className="min-w-0">
-                  <p className="font-bold text-sm text-slate-900 truncate">{img.title || img.fileName}</p>
-                  <p className="text-xs text-slate-500">
+                  <p className="font-bold text-sm text-slate-900 dark:text-white truncate">{img.title || img.fileName}</p>
+                  <p className="text-xs text-slate-500 dark:text-slate-400">
                     {img.format.toUpperCase()} • {(img.size / 1024).toFixed(0)} KB • {img.width}x{img.height}
                   </p>
                 </div>

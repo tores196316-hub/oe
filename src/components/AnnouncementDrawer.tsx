@@ -84,37 +84,37 @@ export const AnnouncementDrawer: React.FC<AnnouncementDrawerProps> = ({
           animate={{ x: 0 }}
           exit={{ x: '100%' }}
           transition={{ type: 'spring', damping: 28, stiffness: 280 }}
-          className="relative w-full max-w-md h-full bg-white shadow-2xl flex flex-col border-l border-slate-200 z-10"
+          className="relative w-full max-w-md h-full bg-white dark:bg-[#0f1017] shadow-2xl flex flex-col border-l border-slate-200 dark:border-slate-800 z-10"
         >
           {/* Header */}
-          <div className="p-5 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+          <div className="p-5 border-b border-slate-100 dark:border-slate-800/80 flex items-center justify-between bg-slate-50/50 dark:bg-slate-900/40">
             <div className="flex items-center gap-2.5">
               <div className="w-9 h-9 rounded-xl bg-indigo-600 text-white flex items-center justify-center shadow-xs">
                 <Bell className="w-4 h-4" />
               </div>
               <div>
-                <h3 className="font-bold text-base text-slate-900 leading-tight">Duyuru Merkezi</h3>
-                <p className="text-xs text-slate-500">Güncellemeler ve sistem haberleri</p>
+                <h3 className="font-bold text-base text-slate-900 dark:text-white leading-tight">Duyuru Merkezi</h3>
+                <p className="text-xs text-slate-500 dark:text-slate-400">Güncellemeler ve sistem haberleri</p>
               </div>
             </div>
 
             <button
               onClick={onClose}
-              className="p-2 rounded-xl text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
+              className="p-2 rounded-xl text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
           </div>
 
           {/* Sub Header / Filters */}
-          <div className="px-5 py-3 bg-white border-b border-slate-100 flex items-center justify-between">
-            <div className="flex items-center gap-1.5 p-1 rounded-xl bg-slate-100 text-xs font-semibold">
+          <div className="px-5 py-3 bg-white dark:bg-[#0f1017] border-b border-slate-100 dark:border-slate-800/80 flex items-center justify-between">
+            <div className="flex items-center gap-1.5 p-1 rounded-xl bg-slate-100 dark:bg-slate-800 text-xs font-semibold">
               <button
                 onClick={() => setActiveFilter('all')}
                 className={`px-3 py-1 rounded-lg transition-all cursor-pointer ${
                   activeFilter === 'all'
-                    ? 'bg-white text-slate-900 shadow-xs'
-                    : 'text-slate-500 hover:text-slate-900'
+                    ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs'
+                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
                 Tümü ({announcements.length})
@@ -123,8 +123,8 @@ export const AnnouncementDrawer: React.FC<AnnouncementDrawerProps> = ({
                 onClick={() => setActiveFilter('unread')}
                 className={`px-3 py-1 rounded-lg transition-all cursor-pointer ${
                   activeFilter === 'unread'
-                    ? 'bg-white text-slate-900 shadow-xs'
-                    : 'text-slate-500 hover:text-slate-900'
+                    ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-xs'
+                    : 'text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                 }`}
               >
                 Okunmamış ({announcements.filter((a) => !readIds.includes(a.id)).length})
@@ -133,7 +133,7 @@ export const AnnouncementDrawer: React.FC<AnnouncementDrawerProps> = ({
 
             <button
               onClick={onMarkAllRead}
-              className="text-xs text-indigo-600 hover:text-indigo-800 font-semibold flex items-center gap-1 cursor-pointer"
+              className="text-xs text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 font-semibold flex items-center gap-1 cursor-pointer"
             >
               <CheckCheck className="w-3.5 h-3.5" /> Okundu Yap
             </button>
@@ -154,8 +154,8 @@ export const AnnouncementDrawer: React.FC<AnnouncementDrawerProps> = ({
                     key={ann.id}
                     className={`p-4 rounded-2xl border transition-all ${
                       isUnread
-                        ? 'bg-indigo-50/40 border-indigo-200/80 shadow-2xs'
-                        : 'bg-white border-slate-200/80 hover:border-slate-300'
+                        ? 'bg-indigo-50/40 dark:bg-indigo-950/30 border-indigo-200/80 dark:border-indigo-800/60 shadow-2xs'
+                        : 'bg-white dark:bg-[#141620] border-slate-200/80 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700'
                     }`}
                   >
                     <div className="flex items-start justify-between gap-2 mb-1.5">
@@ -182,17 +182,17 @@ export const AnnouncementDrawer: React.FC<AnnouncementDrawerProps> = ({
                       </span>
                     </div>
 
-                    <h4 className="text-sm font-bold text-slate-900 leading-snug mb-1">
+                    <h4 className="text-sm font-bold text-slate-900 dark:text-white leading-snug mb-1">
                       {ann.title}
                     </h4>
 
-                    <p className="text-xs text-slate-600 leading-relaxed mb-3">{ann.message}</p>
+                    <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed mb-3">{ann.message}</p>
 
                     {ann.linkUrl && (
                       <a
                         href={ann.linkUrl}
                         target={ann.linkUrl.startsWith('http') ? '_blank' : '_self'}
-                        className="inline-flex items-center gap-1 text-xs font-bold text-indigo-600 hover:text-indigo-800 transition-colors"
+                        className="inline-flex items-center gap-1 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 transition-colors"
                       >
                         <span>{ann.linkText || 'Detayları İncele'}</span>
                         <ExternalLink className="w-3.5 h-3.5" />
@@ -205,14 +205,14 @@ export const AnnouncementDrawer: React.FC<AnnouncementDrawerProps> = ({
           </div>
 
           {/* Footer */}
-          <div className="p-4 border-t border-slate-100 flex items-center justify-between gap-2 text-xs text-slate-500 bg-slate-50/50">
+          <div className="p-4 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between gap-2 text-xs text-slate-500 dark:text-slate-400 bg-slate-50/50 dark:bg-slate-900/40">
             <button
               onClick={() => {
                 localStorage.removeItem('dismissed_announcement_ids');
                 window.dispatchEvent(new Event('storage'));
                 window.location.reload();
               }}
-              className="text-[11px] font-semibold text-indigo-600 hover:text-indigo-800 hover:underline cursor-pointer"
+              className="text-[11px] font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-800 dark:hover:text-indigo-300 hover:underline cursor-pointer"
             >
               Gizlenen Banner Duyurularını Göster
             </button>

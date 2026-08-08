@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useSite } from '../context/SiteContext';
+import { useTheme } from '../context/ThemeContext';
 import { AnnouncementDrawer } from './AnnouncementDrawer';
 import {
   Upload,
@@ -13,12 +14,15 @@ import {
   Info,
   Phone,
   Bell,
+  Sun,
+  Moon,
 } from 'lucide-react';
 
 export const Navbar: React.FC = () => {
   const location = useLocation();
   const { userProfile, isAdmin, logout } = useAuth();
   const { settings, announcements } = useSite();
+  const { isDark, toggleTheme } = useTheme();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [readAnnIds, setReadAnnIds] = useState<string[]>([]);
@@ -53,17 +57,17 @@ export const Navbar: React.FC = () => {
   ];
 
   return (
-    <header className="sticky top-0 z-40 w-full backdrop-blur-xl bg-white/75 border-b border-slate-200/60 shadow-xs transition-all">
+    <header className="sticky top-0 z-40 w-full backdrop-blur-xl bg-white/80 dark:bg-[#0c0d14]/85 border-b border-slate-200/60 dark:border-slate-800/80 shadow-xs transition-colors duration-300">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         {/* Logo */}
         <Link to="/" className="flex items-center gap-2.5 group">
-          <div className="w-9 h-9 rounded-xl bg-slate-900 text-white flex items-center justify-center shadow-md group-hover:scale-105 transition-transform duration-200">
-            <Sparkles className="w-5 h-5 text-indigo-400" />
+          <div className="w-9 h-9 rounded-xl bg-slate-900 dark:bg-indigo-600 text-white flex items-center justify-center shadow-md group-hover:scale-105 transition-transform duration-200">
+            <Sparkles className="w-5 h-5 text-indigo-400 dark:text-indigo-200" />
           </div>
           <div className="flex flex-col">
-            <span className="font-bold text-lg tracking-tight text-slate-900 flex items-center gap-1.5">
+            <span className="font-bold text-lg tracking-tight text-slate-900 dark:text-white flex items-center gap-1.5">
               {settings.siteName || 'İnan Hızlı Medya'}
-              <span className="text-[10px] font-semibold uppercase px-1.5 py-0.5 rounded-full bg-slate-100 border border-slate-200 text-slate-600">
+              <span className="text-[10px] font-semibold uppercase px-1.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300">
                 PRO
               </span>
             </span>
@@ -81,9 +85,9 @@ export const Navbar: React.FC = () => {
                 <Link
                   key={link.path}
                   to={link.path}
-                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium bg-slate-900 text-white shadow-sm hover:bg-slate-800 hover:shadow transition-all mx-1"
+                  className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-medium bg-slate-900 hover:bg-slate-800 dark:bg-indigo-600 dark:hover:bg-indigo-500 text-white shadow-sm hover:shadow transition-all mx-1"
                 >
-                  <Upload className="w-4 h-4 text-indigo-400" />
+                  <Upload className="w-4 h-4 text-indigo-400 dark:text-indigo-200" />
                   {link.name}
                 </Link>
               );
@@ -95,11 +99,11 @@ export const Navbar: React.FC = () => {
                 to={link.path}
                 className={`flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-medium transition-colors ${
                   active
-                    ? 'text-slate-900 bg-slate-100 font-semibold'
-                    : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50'
+                    ? 'text-slate-900 dark:text-white bg-slate-100 dark:bg-slate-800/80 font-semibold'
+                    : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-800/50'
                 }`}
               >
-                {Icon && <Icon className="w-4 h-4 text-slate-400" />}
+                {Icon && <Icon className="w-4 h-4 text-slate-400 dark:text-slate-500" />}
                 {link.name}
               </Link>
             );
@@ -107,16 +111,30 @@ export const Navbar: React.FC = () => {
         </nav>
 
         {/* User Auth & Actions */}
-        <div className="hidden md:flex items-center gap-3">
+        <div className="hidden md:flex items-center gap-2.5">
+          {/* Dark / Light Mode Toggle Button */}
+          <button
+            onClick={toggleTheme}
+            className="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/80 transition-all cursor-pointer"
+            title={isDark ? 'Aydınlık Moda Geç' : 'Karanlık Moda Geç'}
+            aria-label="Tema Değiştir"
+          >
+            {isDark ? (
+              <Sun className="w-5 h-5 text-amber-400 transition-transform duration-300 hover:rotate-45" />
+            ) : (
+              <Moon className="w-5 h-5 text-slate-600 transition-transform duration-300 hover:-rotate-12" />
+            )}
+          </button>
+
           {/* Notification Bell */}
           <button
             onClick={() => setDrawerOpen(true)}
-            className="relative p-2 rounded-xl text-slate-600 hover:text-slate-900 hover:bg-slate-100 transition-colors cursor-pointer"
+            className="relative p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/80 transition-colors cursor-pointer"
             title="Duyuru Merkezi"
           >
-            <Bell className="w-5 h-5 text-slate-600" />
+            <Bell className="w-5 h-5 text-slate-600 dark:text-slate-300" />
             {unreadCount > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-indigo-600 text-white text-[10px] font-black flex items-center justify-center border-2 border-white shadow-2xs animate-bounce">
+              <span className="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 rounded-full bg-indigo-600 text-white text-[10px] font-black flex items-center justify-center border-2 border-white dark:border-[#0c0d14] shadow-2xs animate-bounce">
                 {unreadCount}
               </span>
             )}
@@ -125,20 +143,20 @@ export const Navbar: React.FC = () => {
           {isAdmin && (
             <Link
               to="/admin"
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-indigo-50 border border-indigo-200/80 text-indigo-700 hover:bg-indigo-100 transition-colors"
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl text-xs font-semibold bg-indigo-50 dark:bg-indigo-950/60 border border-indigo-200/80 dark:border-indigo-800/80 text-indigo-700 dark:text-indigo-300 hover:bg-indigo-100 dark:hover:bg-indigo-900/80 transition-colors"
             >
-              <ShieldCheck className="w-4 h-4 text-indigo-600" />
+              <ShieldCheck className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
               Admin Paneli
             </Link>
           )}
 
           {userProfile ? (
-            <div className="flex items-center gap-2 pl-2 border-l border-slate-200">
+            <div className="flex items-center gap-2 pl-2 border-l border-slate-200 dark:border-slate-800">
               <Link
                 to="/profil"
-                className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-slate-100 transition-colors text-slate-700"
+                className="flex items-center gap-2 p-1.5 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800/80 transition-colors text-slate-700 dark:text-slate-300"
               >
-                <div className="w-8 h-8 rounded-full bg-slate-200 flex items-center justify-center font-bold text-xs text-slate-700 uppercase">
+                <div className="w-8 h-8 rounded-full bg-slate-200 dark:bg-slate-700 flex items-center justify-center font-bold text-xs text-slate-700 dark:text-slate-200 uppercase">
                   {userProfile.displayName?.substring(0, 2) || 'US'}
                 </div>
                 <span className="text-sm font-medium max-w-[100px] truncate">
@@ -147,7 +165,7 @@ export const Navbar: React.FC = () => {
               </Link>
               <button
                 onClick={logout}
-                className="text-xs text-slate-400 hover:text-slate-700 transition-colors px-2 py-1 cursor-pointer"
+                className="text-xs text-slate-400 dark:text-slate-500 hover:text-slate-700 dark:hover:text-slate-200 transition-colors px-2 py-1 cursor-pointer"
               >
                 Çıkış
               </button>
@@ -156,13 +174,13 @@ export const Navbar: React.FC = () => {
             <div className="flex items-center gap-2">
               <Link
                 to="/giris"
-                className="px-3.5 py-2 rounded-xl text-sm font-medium text-slate-700 hover:text-slate-900 hover:bg-slate-100 transition-colors"
+                className="px-3.5 py-2 rounded-xl text-sm font-medium text-slate-700 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800/80 transition-colors"
               >
                 Giriş Yap
               </Link>
               <Link
                 to="/kayit"
-                className="px-3.5 py-2 rounded-xl text-sm font-medium bg-slate-100 hover:bg-slate-200 border border-slate-200 text-slate-900 transition-colors"
+                className="px-3.5 py-2 rounded-xl text-sm font-medium bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white transition-colors"
               >
                 Kayıt Ol
               </Link>
@@ -170,11 +188,23 @@ export const Navbar: React.FC = () => {
           )}
         </div>
 
-        {/* Mobile Hamburger Toggle & Bell */}
-        <div className="flex items-center gap-2 md:hidden">
+        {/* Mobile Hamburger Toggle, Theme Switcher & Bell */}
+        <div className="flex items-center gap-1.5 md:hidden">
+          <button
+            onClick={toggleTheme}
+            className="p-2 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+            title={isDark ? 'Aydınlık Mod' : 'Karanlık Mod'}
+          >
+            {isDark ? (
+              <Sun className="w-5 h-5 text-amber-400" />
+            ) : (
+              <Moon className="w-5 h-5 text-slate-700" />
+            )}
+          </button>
+
           <button
             onClick={() => setDrawerOpen(true)}
-            className="relative p-2 rounded-xl text-slate-700 hover:bg-slate-100 transition-colors"
+            className="relative p-2 rounded-xl text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
             title="Duyuru Merkezi"
           >
             <Bell className="w-5 h-5" />
@@ -185,13 +215,13 @@ export const Navbar: React.FC = () => {
 
           <Link
             to="/upload"
-            className="p-2 rounded-xl bg-slate-900 text-white flex items-center justify-center"
+            className="p-2 rounded-xl bg-slate-900 dark:bg-indigo-600 text-white flex items-center justify-center"
           >
             <Upload className="w-4 h-4" />
           </Link>
           <button
             onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            className="p-2 rounded-xl text-slate-600 hover:bg-slate-100 transition-colors"
+            className="p-2 rounded-xl text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
           >
             {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
           </button>
@@ -200,7 +230,7 @@ export const Navbar: React.FC = () => {
 
       {/* Mobile Drawer */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-b border-slate-200 bg-white/95 backdrop-blur-lg px-4 pt-2 pb-6 space-y-2">
+        <div className="md:hidden border-b border-slate-200 dark:border-slate-800 bg-white/95 dark:bg-[#0c0d14]/95 backdrop-blur-lg px-4 pt-2 pb-6 space-y-2">
           {navLinks.map((link) => (
             <Link
               key={link.path}
@@ -208,25 +238,25 @@ export const Navbar: React.FC = () => {
               onClick={() => setMobileMenuOpen(false)}
               className={`flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium ${
                 isActive(link.path)
-                  ? 'bg-slate-100 text-slate-900 font-semibold'
-                  : 'text-slate-600 hover:bg-slate-50'
+                  ? 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white font-semibold'
+                  : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50'
               }`}
             >
-              {link.icon && <link.icon className="w-5 h-5 text-slate-500" />}
+              {link.icon && <link.icon className="w-5 h-5 text-slate-500 dark:text-slate-400" />}
               {link.name}
             </Link>
           ))}
 
-          <div className="pt-4 border-t border-slate-200 space-y-2">
+          <div className="pt-4 border-t border-slate-200 dark:border-slate-800 space-y-2">
             <button
               onClick={() => {
                 setMobileMenuOpen(false);
                 setDrawerOpen(true);
               }}
-              className="w-full flex items-center justify-between px-4 py-3 rounded-xl text-base font-semibold bg-indigo-50/70 text-indigo-700"
+              className="w-full flex items-center justify-between px-4 py-3 rounded-xl text-base font-semibold bg-indigo-50/70 dark:bg-indigo-950/60 text-indigo-700 dark:text-indigo-300"
             >
               <span className="flex items-center gap-3">
-                <Bell className="w-5 h-5 text-indigo-600" />
+                <Bell className="w-5 h-5 text-indigo-600 dark:text-indigo-400" />
                 Duyurular & Bildirimler
               </span>
               {unreadCount > 0 && (
@@ -240,7 +270,7 @@ export const Navbar: React.FC = () => {
               <Link
                 to="/admin"
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-semibold bg-slate-100 text-slate-900"
+                className="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-semibold bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-white"
               >
                 <ShieldCheck className="w-5 h-5" />
                 Admin Paneli
@@ -252,9 +282,9 @@ export const Navbar: React.FC = () => {
                 <Link
                   to="/profil"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium text-slate-700 hover:bg-slate-50"
+                  className="flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/50"
                 >
-                  <Grid className="w-5 h-5 text-slate-500" />
+                  <Grid className="w-5 h-5 text-slate-500 dark:text-slate-400" />
                   Profilim ({userProfile.displayName})
                 </Link>
                 <button
@@ -262,7 +292,7 @@ export const Navbar: React.FC = () => {
                     logout();
                     setMobileMenuOpen(false);
                   }}
-                  className="w-full text-left px-4 py-3 rounded-xl text-base font-medium text-rose-600 hover:bg-rose-50"
+                  className="w-full text-left px-4 py-3 rounded-xl text-base font-medium text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/30"
                 >
                   Çıkış Yap
                 </button>
@@ -272,14 +302,14 @@ export const Navbar: React.FC = () => {
                 <Link
                   to="/giris"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="text-center py-2.5 rounded-xl border border-slate-200 text-slate-700 font-medium text-sm"
+                  className="text-center py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-medium text-sm"
                 >
                   Giriş Yap
                 </Link>
                 <Link
                   to="/kayit"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="text-center py-2.5 rounded-xl bg-slate-900 text-white font-medium text-sm"
+                  className="text-center py-2.5 rounded-xl bg-slate-900 dark:bg-indigo-600 text-white font-medium text-sm"
                 >
                   Kayıt Ol
                 </Link>
@@ -299,3 +329,4 @@ export const Navbar: React.FC = () => {
     </header>
   );
 };
+
